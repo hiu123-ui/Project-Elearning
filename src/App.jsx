@@ -6,6 +6,8 @@ import CourseDetailPage from "./page/course-detail"
 import Hometemplate from "./templates/Hometemplate"
 import AuthTemplate from "./templates/AuthTemplate"
 import { renderRouters } from "./router";
+import Toast from "./components/Toast/Toast";
+
 
 
 function App() {
@@ -13,6 +15,7 @@ function App() {
 
   return (
     <>
+    <Toast />
       <BrowserRouter>
         <Routes>
           {/* <Route path="" element={<Hometemplate />} >
