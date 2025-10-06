@@ -9,7 +9,12 @@ const FrontendCourse = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 4; // số item hiển thị trên 1 dòng
-
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
   const DEFAULT_IMG =
     "https://rickchilling.com/wp-content/uploads/2024/07/khoa-hoc-lap-trinh-front-end.png";
 
@@ -35,8 +40,14 @@ const FrontendCourse = () => {
     };
   }, []);
 
-  const openDetail = (id) => navigate(`/detail/${id}`);
-  const openAll = () => navigate("/course-page/FrontEnd");
+  const openDetail = (id) => {
+    navigate(`/detail/${id}`);
+    scrollToTop();
+  };
+  const openAll = () => {
+    navigate("/course-page/FrontEnd");
+    scrollToTop();
+  };
 
   // Tính toán dữ liệu phân trang
   const totalPages = Math.ceil(courses.length / pageSize);
@@ -144,11 +155,10 @@ const FrontendCourse = () => {
                 <button
                   key={i}
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`px-3 py-1 border rounded-md text-sm ${
-                    currentPage === i + 1
+                  className={`px-3 py-1 border rounded-md text-sm ${currentPage === i + 1
                       ? "bg-indigo-600 text-white border-indigo-600"
                       : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                    }`}
                 >
                   {i + 1}
                 </button>

@@ -1,5 +1,6 @@
 // stores/course/index.js
 import { createSlice } from '@reduxjs/toolkit'
+import { LocalStorage, keyLocalStorage } from '../../ultil/localStorage';
 
 const initialState = {
   listCourse: [],
@@ -35,6 +36,27 @@ const courseSlice = createSlice({
     updateEnrollmentStatusAction: (state, action) => {
       const { courseId, status } = action.payload;
       state.enrollmentStatus[courseId] = status;
+    },
+     setInfoUser: (state, action) => {
+      state.infoUser = action.payload;
+      LocalStorage.set(keyLocalStorage.INFO_USER, action.payload);
+    },
+    // THÊM ACTION MỚI: Cập nhật thông tin user với khóa học
+    updateUserCourses: (state, action) => {
+      if (state.infoUser) {
+        state.infoUser = { ...state.infoUser, ...action.payload };
+        LocalStorage.set(keyLocalStorage.INFO_USER, state.infoUser);
+      }
+    },
+    clearRegisterSuccess: (state) => {
+      state.registerSuccess = false;
+    },
+    clearError: (state) => {
+      state.error = null;
+    },
+    logout: (state) => {
+      state.infoUser = null;
+      LocalStorage.remove(keyLocalStorage.INFO_USER);
     }
   }
 });
@@ -42,6 +64,7 @@ const courseSlice = createSlice({
 export const { 
   setListCourseAction, 
   setCategoryAction, 
+  updateUserCourses,
   setCoursesByCategoryAction, 
   setSearchResultsAction,
   setEnrollmentStatusAction,

@@ -44,7 +44,12 @@ const BannerPage = () => {
             gradient: "linear-gradient(135deg, rgba(245, 158, 11, 0.8), rgba(239, 68, 68, 0.8))"
         },
     ];
-
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
     return (
         <div className="relative h-[600px] md:h-[800px]">
             <Swiper
@@ -87,7 +92,10 @@ const BannerPage = () => {
                                         type="primary"
                                         size="large"
                                         icon={<BookOutlined />}
-                                        onClick={() => navigate("/register")}
+                                        onClick={() => {
+                                            navigate("/register");
+                                            scrollToTop();
+                                        }}
                                         className="h-12 rounded-full border border-white/30 bg-white/20 px-8 text-base font-semibold shadow-lg backdrop-blur transition hover:bg-white/30 hover:-translate-y-0.5"
                                     >
                                         {slide.primaryBtn}

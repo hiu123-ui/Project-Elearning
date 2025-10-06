@@ -24,6 +24,19 @@ const HeaderPages = () => {
     const dispatch = useDispatch();
     const { infoUser } = useSelector((state) => state.userSlice);
 
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // Cuộn mượt
+        });
+    };
+
+    // Hàm xử lý điều hướng và cuộn lên đầu trang
+    const handleNavigate = (path) => {
+        navigate(path);
+        scrollToTop();
+    };
+
     // Đóng dropdown khi click outside
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -75,6 +88,7 @@ const HeaderPages = () => {
             setShowSearchResults(false);
             setSearchQuery("");
             setMobileMenuOpen(false); // Đóng mobile menu
+            scrollToTop(); // THÊM DÒNG NÀY
         }
     };
 
@@ -84,6 +98,7 @@ const HeaderPages = () => {
         setShowSearchResults(false);
         setSearchQuery("");
         setMobileMenuOpen(false);
+        scrollToTop(); // THÊM DÒNG NÀY
     };
 
     const handleShowMenu = async () => {
@@ -113,6 +128,7 @@ const HeaderPages = () => {
         localStorage.removeItem("INFO_USER");
         dispatch(setInfoUser(null));
         navigate("/login");
+        scrollToTop(); // THÊM DÒNG NÀY
         // Thêm toast notification
         if (window.showToast) {
             window.showToast("Đăng xuất thành công", "success");
@@ -122,6 +138,7 @@ const HeaderPages = () => {
     const handleQuickAction = (action) => {
         setUserMenuOpen(false);
         navigate(action);
+        scrollToTop(); // THÊM DÒNG NÀY
     };
 
     const isLoggedIn = infoUser && Object.keys(infoUser).length > 0;
@@ -131,8 +148,8 @@ const HeaderPages = () => {
             {/* Logo với animation */}
             <div
                 className="font-bold text-xl lg:text-2xl text-blue-500 tracking-wide cursor-pointer transition-transform hover:scale-105 active:scale-95"
-                onClick={() => navigate("/")}
-                onKeyPress={(e) => e.key === "Enter" && navigate("/")}
+                onClick={() => handleNavigate("/")} // CẬP NHẬT
+                onKeyPress={(e) => e.key === "Enter" && handleNavigate("/")} // CẬP NHẬT
                 tabIndex={0}
                 role="button"
                 aria-label="Trang chủ"
@@ -152,7 +169,7 @@ const HeaderPages = () => {
                 ].map((item) => (
                     <button
                         key={item.path}
-                        onClick={() => navigate(item.path)}
+                        onClick={() => handleNavigate(item.path)} // CẬP NHẬT
                         className="flex items-center gap-1 hover:text-blue-500 transition-all duration-200 hover:scale-105"
                         aria-label={item.label}
                     >
@@ -208,6 +225,7 @@ const HeaderPages = () => {
                                             onClick={() => {
                                                 navigate(`/course-page/${cat.maDanhMuc}`);
                                                 setShowMenu(false);
+                                                scrollToTop();
                                             }}
                                             className="w-full px-4 py-3 text-left hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150 flex items-center gap-3 group"
                                         >
@@ -323,9 +341,8 @@ const HeaderPages = () => {
 
                                 {[
                                     { path: "/profile", label: "👤 Hồ sơ cá nhân", action: "/profile" },
-                                    { path: "/my-courses", label: "📚 Khóa học của tôi", action: "/my-courses" }, // Thêm dòng này
-                                    { path: "/settings", label: "⚙️ Cài đặt", action: "/settings" },
-                                    { path: "/help", label: "❓ Trợ giúp", action: "/help" }
+                                    { path: "/my-courses", label: "📚 Khóa học của tôi", action: "/my-courses" },
+                                  
                                 ].map((item) => (
                                     <button
                                         key={item.path}
@@ -352,13 +369,13 @@ const HeaderPages = () => {
                 ) : (
                     <div className="flex gap-2">
                         <button
-                            onClick={() => navigate("/login")}
+                            onClick={() => handleNavigate("/login")} // CẬP NHẬT
                             className="px-6 py-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-200 hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 font-medium"
                         >
                             Đăng nhập
                         </button>
                         <button
-                            onClick={() => navigate("/register")}
+                            onClick={() => handleNavigate("/register")} // CẬP NHẬT
                             className="px-6 py-2 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-white hover:from-yellow-500 hover:to-yellow-600 transition-all duration-200 hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0 font-medium"
                         >
                             Đăng ký
@@ -391,7 +408,7 @@ const HeaderPages = () => {
                                 <div
                                     className="font-bold text-lg text-blue-500 cursor-pointer"
                                     onClick={() => {
-                                        navigate("/");
+                                        handleNavigate("/"); // CẬP NHẬT
                                         setMobileMenuOpen(false);
                                     }}
                                 >
@@ -462,6 +479,7 @@ const HeaderPages = () => {
                                                 setMobileMenuOpen(false);
                                                 setShowSearchResults(false);
                                                 setSearchQuery("");
+                                                scrollToTop(); // THÊM DÒNG NÀY
                                             }}
                                             className="w-full p-3 text-center text-blue-600 hover:bg-white transition-colors text-sm font-medium"
                                         >
@@ -483,7 +501,7 @@ const HeaderPages = () => {
                                 <button
                                     key={item.path}
                                     onClick={() => {
-                                        navigate(item.path);
+                                        handleNavigate(item.path); // CẬP NHẬT
                                         setMobileMenuOpen(false);
                                     }}
                                     className="w-full text-left p-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150 flex items-center gap-3"
@@ -508,6 +526,7 @@ const HeaderPages = () => {
                                             onClick={() => {
                                                 navigate(`/course-page/${cat.maDanhMuc}`);
                                                 setMobileMenuOpen(false);
+                                                scrollToTop();
                                             }}
                                             className="w-full text-left p-3 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150 flex items-center gap-3 text-sm"
                                         >
@@ -524,19 +543,18 @@ const HeaderPages = () => {
                             {isLoggedIn ? (
                                 <div className="space-y-3">
                                     {[
-                                        { path: "/profile", label: "👤 Hồ sơ" },
-                                        { path: "/my-courses", label: "📚 Khóa học của tôi" },
-                                        { path: "/settings", label: "⚙️ Cài đặt" }
+                                        { path: "/profile", label: "👤 Hồ sơ cá nhân", action: "/profile" },
+                                        { path: "/my-courses", label: "📚 Khóa học của tôi", action: "/my-courses" },
                                     ].map((item) => (
                                         <button
                                             key={item.path}
                                             onClick={() => {
-                                                navigate(item.path);
-                                                setMobileMenuOpen(false);
+                                                handleQuickAction(item.action);
                                             }}
-                                            className="w-full text-left p-3 rounded-lg hover:bg-gray-100 transition-colors duration-150 flex items-center gap-3 text-sm"
+                                            className="w-full px-4 py-3 text-left hover:bg-blue-50 hover:text-blue-600 transition-colors duration-150 flex items-center gap-3 text-sm"
                                         >
-                                            {item.label}
+                                            <span className="text-base">{item.label.split(' ')[0]}</span>
+                                            {item.label.split(' ').slice(1).join(' ')}
                                         </button>
                                     ))}
                                     <button
@@ -550,7 +568,7 @@ const HeaderPages = () => {
                                 <div className="space-y-3">
                                     <button
                                         onClick={() => {
-                                            navigate("/login");
+                                            handleNavigate("/login"); // CẬP NHẬT
                                             setMobileMenuOpen(false);
                                         }}
                                         className="w-full p-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-colors duration-200 font-medium"
@@ -559,7 +577,7 @@ const HeaderPages = () => {
                                     </button>
                                     <button
                                         onClick={() => {
-                                            navigate("/register");
+                                            handleNavigate("/register"); // CẬP NHẬT
                                             setMobileMenuOpen(false);
                                         }}
                                         className="w-full p-3 bg-yellow-500 text-white rounded-full hover:bg-yellow-600 transition-colors duration-200 font-medium"

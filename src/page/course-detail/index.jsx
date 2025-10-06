@@ -19,13 +19,11 @@ const CourseDetailPage = () => {
   const [imageError, setImageError] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isEnrolling, setIsEnrolling] = useState(false);
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   // Lấy dữ liệu từ Redux store
   const enrollmentStatus = useSelector(state => state.courseSlice.enrollmentStatus);
-  const enrolledCourses = useSelector(state => state.courseSlice.enrolledCourses);
   const { infoUser } = useSelector((state) => state.userSlice);
   const userInfo = LocalStorage.get(keyLocalStorage.INFO_USER);
 
@@ -95,7 +93,6 @@ const CourseDetailPage = () => {
     fetchCourseDetail();
   }, [fetchCourseDetail]);
 
-  // Hàm xử lý đăng ký khóa học - CẢI TIẾN
   const handleEnroll = async () => {
     if (!userInfo) {
       const event = new CustomEvent('showToast', {
@@ -109,7 +106,6 @@ const CourseDetailPage = () => {
       return;
     }
 
-    // Kiểm tra nếu đã đăng ký
     if (isCourseEnrolled) {
       const event = new CustomEvent('showToast', {
         detail: {
@@ -139,22 +135,18 @@ const CourseDetailPage = () => {
         });
         window.dispatchEvent(event);
 
-        // Đợi một chút để người dùng thấy thông báo
+        // QUAN TRỌNG: Gửi sự kiện để MyCourses refresh
+        const enrollmentEvent = new CustomEvent('enrollmentSuccess');
+        window.dispatchEvent(enrollmentEvent);
+
+        // Đợi một chút để refresh data rồi mới chuyển hướng
         setTimeout(() => {
           navigate('/my-courses');
-        }, 1500);
+        }, 2000);
       }
     } catch (error) {
       console.error('❌ Lỗi trong quá trình đăng ký:', error);
-
-      // Hiển thị thông báo lỗi
-      const event = new CustomEvent('showToast', {
-        detail: {
-          message: error.message || 'Đăng ký thất bại. Vui lòng thử lại!',
-          type: 'error'
-        }
-      });
-      window.dispatchEvent(event);
+      // ... xử lý lỗi
     } finally {
       setIsEnrolling(false);
     }
@@ -168,6 +160,15 @@ const CourseDetailPage = () => {
 
   const handleImageLoad = () => setImageLoaded(true);
   const handleImageError = () => setImageError(true);
+
+  // 👉 Auto scroll to top khi load trang / đổi khóa học
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [courseID]);
+  // Cuộn lên đầu trang mỗi khi đổi courseID
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [courseID]);
 
   const formatDate = (dateString) => {
     if (!dateString) return '—';
@@ -674,7 +675,6 @@ const CourseQuickInfo = ({ course, formatDate }) => (
 );
 
 // Course Actions Component - CẬP NHẬT
-// Course Actions Component - CẬP NHẬT
 const CourseActions = ({ courseID, onShare, onEnroll, isEnrolling, isEnrolled, userInfo, navigate }) => {
   return (
     <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 space-y-4">
@@ -682,9 +682,8 @@ const CourseActions = ({ courseID, onShare, onEnroll, isEnrolling, isEnrolled, u
         <button
           onClick={onEnroll}
           disabled={isEnrolling}
-          className={`w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 shadow-lg hover:shadow-xl ${
-            isEnrolling ? 'opacity-50 cursor-not-allowed' : 'hover:from-indigo-700 hover:to-purple-700'
-          }`}
+          className={`w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 shadow-lg hover:shadow-xl ${isEnrolling ? 'opacity-50 cursor-not-allowed' : 'hover:from-indigo-700 hover:to-purple-700'
+            }`}
         >
           {isEnrolling ? (
             <div className="flex items-center justify-center space-x-2">

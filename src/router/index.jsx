@@ -14,6 +14,7 @@ import InfoPage from "../page/info/InfoPage";
 import SearchPage from "../page/search";
 import { useSelector } from "react-redux"; // thêm useSelector
 import MyCoursesPage from "../page/mycourse";
+import ProfilePage from "../page/profile";
 
 // GuestOnlyLayout: chặn người đã đăng nhập vào nhóm route Auth (login/register)
 function GuestOnlyLayout() {
@@ -70,11 +71,11 @@ const routers = [
             },
             {
                 path: "/my-courses",
-                element: (
-                    <RequireAuth>
-                        <MyCoursesPage />
-                    </RequireAuth>
-                ),
+                element: <RequireAuth><MyCoursesPage /></RequireAuth>
+            },
+            {
+                path: "/profile",
+                element: <RequireAuth><ProfilePage /></RequireAuth>
             },
         ]
     },
@@ -82,7 +83,7 @@ const routers = [
     {
         path: "",
         element: <GuestOnlyLayout />, // đổi từ <AuthTemplate /> sang GuestOnlyLayout
-        
+
         children: [
             {
                 path: "/login",

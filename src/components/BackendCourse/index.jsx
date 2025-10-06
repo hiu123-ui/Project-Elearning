@@ -9,7 +9,12 @@ const BackendCourse = () => {
 
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 4; // số item hiển thị trên 1 dòng
-
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
     const DEFAULT_IMG =
         "https://canhme.com/wp-content/uploads/2018/09/Nodejs.png";
 
@@ -35,8 +40,15 @@ const BackendCourse = () => {
         };
     }, []);
 
-    const openDetail = (id) => navigate(`/detail/${id}`);
-    const openAll = () => navigate("/course-page/BackEnd");
+    const openDetail = (id) => {
+        navigate(`/detail/${id}`);
+        scrollToTop();
+    };
+    const openAll = () => {
+        navigate("/course-page/BackEnd");
+        scrollToTop();
+    };
+
 
     // Tính toán dữ liệu phân trang
     const totalPages = Math.ceil(courses.length / pageSize);
@@ -151,8 +163,8 @@ const BackendCourse = () => {
                                         key={i}
                                         onClick={() => setCurrentPage(i + 1)}
                                         className={`px-3 py-1 border rounded-md text-sm ${currentPage === i + 1
-                                                ? "bg-indigo-600 text-white border-indigo-600"
-                                                : "text-gray-700 hover:bg-gray-100"
+                                            ? "bg-indigo-600 text-white border-indigo-600"
+                                            : "text-gray-700 hover:bg-gray-100"
                                             }`}
                                     >
                                         {i + 1}

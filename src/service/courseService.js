@@ -1,3 +1,4 @@
+// service/courseService.js
 import { axiosCustom } from "./config";
 
 export const courseService = {
@@ -13,58 +14,39 @@ export const courseService = {
     getCoursesByCategory: (maDanhMuc, maNhom) => {
         return axiosCustom.get(`/QuanLyKhoaHoc/LayKhoaHocTheoDanhMuc?maDanhMuc=${maDanhMuc}&MaNhom=${maNhom}`);
     },
-    // Thêm hàm search courses
+    
     searchCourses: (searchTerm) => {
         return axiosCustom.get(`/QuanLyKhoaHoc/LayDanhSachKhoaHoc?MaNhom=GP01&tenKhoaHoc=${encodeURIComponent(searchTerm)}`);
     },
-    // courseService.js - cập nhật hàm enrollCourse
+    
+    // Đăng ký khóa học
     enrollCourse: (data) => {
         return axiosCustom.post('/QuanLyKhoaHoc/DangKyKhoaHoc', data);
     },
 
-    // Thêm hàm hủy đăng ký (nếu cần)
-    unenrollCourse: (data) => {
+    // Hủy ghi danh
+     unenrollCourse: (data) => {
         return axiosCustom.post('/QuanLyKhoaHoc/HuyGhiDanh', data);
     },
 
-    // Thêm hàm kiểm tra trạng thái đăng ký
-    checkEnrollment: (maKhoaHoc, taiKhoan) => {
-        return axiosCustom.post('/QuanLyKhoaHoc/KiemTraGhiDanh', { maKhoaHoc, taiKhoan });
-    },
-    enrollCourse: (data) => {
-        return axiosCustom.post('/QuanLyKhoaHoc/DangKyKhoaHoc', data);
-    },
-    
+    // Kiểm tra ghi danh
     checkEnrollment: (maKhoaHoc, taiKhoan) => {
         return axiosCustom.post('/QuanLyKhoaHoc/KiemTraGhiDanh', { 
             maKhoaHoc, 
             taiKhoan 
         });
     },
-     // THÊM HÀM NÀY: Lấy danh sách khóa học đã đăng ký
-    getEnrolledCourses: (taiKhoan) => {
-        // API lấy danh sách khóa học đã ghi danh cho user
-        return axiosCustom.post('/QuanLyNguoiDung/LayDanhSachKhoaHocDaGhiDanh', {
-            taiKhoan: taiKhoan
-        });
+    
+    // QUAN TRỌNG: Sửa lại hàm getEnrolledCourses - sử dụng API lấy thông tin tài khoản
+    getEnrolledCourses: () => {
+        // Sử dụng API lấy thông tin tài khoản, vì thông tin khóa học đã đăng ký có trong user info
+        return axiosCustom.post('/QuanLyNguoiDung/ThongTinTaiKhoan');
     },
     
-    // Hoặc nếu API khác, sử dụng hàm này:
+    // Hoặc nếu có API riêng cho khóa học đã đăng ký
     getCoursesByUser: (taiKhoan) => {
         return axiosCustom.post('/QuanLyNguoiDung/LayDanhSachKhoaHocDaGhiDanh', {
             taiKhoan: taiKhoan
         });
-    },
-    
-    enrollCourse: (data) => {
-        return axiosCustom.post('/QuanLyKhoaHoc/DangKyKhoaHoc', data);
-    },
-    
-    checkEnrollment: (maKhoaHoc, taiKhoan) => {
-        return axiosCustom.post('/QuanLyKhoaHoc/KiemTraGhiDanh', { 
-            maKhoaHoc, 
-            taiKhoan 
-        });
     }
-
 }

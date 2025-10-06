@@ -82,7 +82,12 @@ const teachers = [
         description: 'Chuyên gia PHP với nhiều năm kinh nghiệm'
     },
 ];
-
+const scrollToTop = () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+};
 const TeacherPage = () => {
     const [selectedTeacher, setSelectedTeacher] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -108,7 +113,7 @@ const TeacherPage = () => {
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                         Học tập từ những chuyên gia hàng đầu với nhiều năm kinh nghiệm thực tế
                     </p>
-                    
+
                     {/* Stats Overview */}
                     <div className="flex justify-center gap-8 mt-8">
                         <div className="text-center">
@@ -138,7 +143,7 @@ const TeacherPage = () => {
                             {/* Teacher Badge */}
                             <div className="absolute top-3 right-3 z-10">
                                 {teacher.badges.map((badge, index) => (
-                                    <Tag 
+                                    <Tag
                                         key={index}
                                         color={index === 0 ? "gold" : "blue"}
                                         className="text-xs font-semibold"
@@ -151,9 +156,9 @@ const TeacherPage = () => {
                             {/* Avatar with Gradient Border */}
                             <div className="relative mb-6">
                                 <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-pink-500 rounded-full w-24 h-24 mx-auto transform group-hover:scale-110 transition-transform duration-300"></div>
-                                <Avatar 
-                                    size={90} 
-                                    src={teacher.avatar} 
+                                <Avatar
+                                    size={90}
+                                    src={teacher.avatar}
                                     className="relative mx-auto border-4 border-white shadow-lg"
                                 />
                             </div>
@@ -161,7 +166,7 @@ const TeacherPage = () => {
                             <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
                                 {teacher.name}
                             </h3>
-                            
+
                             <Tooltip title={teacher.description}>
                                 <p className="text-sm text-gray-600 mb-3 leading-tight">
                                     Chuyên gia {teacher.specialty}
@@ -199,9 +204,9 @@ const TeacherPage = () => {
                             </div>
 
                             {/* Action Button */}
-                            <Button 
-                                type="primary" 
-                                ghost 
+                            <Button
+                                type="primary"
+                                ghost
                                 className="w-full border-blue-500 text-blue-600 hover:bg-blue-50 font-semibold"
                                 icon={<MessageOutlined />}
                             >
@@ -225,20 +230,20 @@ const TeacherPage = () => {
                                 <TrophyOutlined className="text-3xl text-yellow-300 mr-3" />
                                 <span className="text-yellow-300 font-semibold">Học viên xuất sắc</span>
                             </div>
-                            
+
                             <blockquote className="text-2xl lg:text-3xl font-light leading-relaxed mb-6">
-                                "Chương trình giảng dạy được biên soạn cực kỳ chuyên nghiệp, từ cơ bản đến nâng cao. 
+                                "Chương trình giảng dạy được biên soạn cực kỳ chuyên nghiệp, từ cơ bản đến nâng cao.
                                 Giảng viên nhiệt tình hỗ trợ 24/7. Mình đã có việc làm ngay sau khi hoàn thành khoá học!"
                             </blockquote>
-                            
+
                             <div>
                                 <p className="font-bold text-xl">Nhi Dev</p>
                                 <p className="text-blue-100">Fullstack Developer tại TechV Corporation</p>
                                 <div className="flex items-center mt-2">
-                                    <Rate 
-                                        disabled 
-                                        defaultValue={5} 
-                                        className="text-yellow-300 text-sm" 
+                                    <Rate
+                                        disabled
+                                        defaultValue={5}
+                                        className="text-yellow-300 text-sm"
                                     />
                                     <span className="ml-2 text-blue-100">Đã hoàn thành 5 khoá học</span>
                                 </div>
@@ -255,7 +260,7 @@ const TeacherPage = () => {
                                     />
                                 </div>
                             </div>
-                            
+
                             {/* Achievement Badges */}
                             <div className="absolute -bottom-4 -left-4 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-sm font-bold shadow-lg">
                                 ⭐ Top 1%
@@ -273,15 +278,19 @@ const TeacherPage = () => {
                         Tham gia cộng đồng 10,000+ học viên đã thành công với sự hướng dẫn của các giảng viên hàng đầu
                     </p>
                     <div className="flex gap-4 justify-center">
-                        <Button 
-                            type="primary" 
+                        <Button
+                            type="primary"
                             size="large"
                             className="bg-gradient-to-r from-blue-500 to-purple-600 border-0 font-semibold h-12 px-8"
                             icon={<PlayCircleOutlined />}
+                            onClick={() => {
+                                navigate("/course");
+                                scrollToTop();
+                            }}
                         >
                             Xem khoá học ngay
                         </Button>
-                        <Button 
+                        <Button
                             size="large"
                             className="font-semibold h-12 px-8"
                         >
@@ -314,7 +323,7 @@ const TeacherPage = () => {
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div className="grid grid-cols-2 gap-4 mb-6">
                                 <div className="bg-gray-50 p-3 rounded-lg">
                                     <div className="font-semibold">Kinh nghiệm</div>
@@ -333,7 +342,7 @@ const TeacherPage = () => {
                                     <div>{selectedTeacher.badges.join(', ')}</div>
                                 </div>
                             </div>
-                            
+
                             <p className="text-gray-700">{selectedTeacher.description}</p>
                         </div>
                     )}
