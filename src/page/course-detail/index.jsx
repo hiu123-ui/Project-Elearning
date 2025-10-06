@@ -559,13 +559,118 @@ const DescriptionCard = ({ course }) => (
       </svg>
       <span>Mô tả khóa học</span>
     </h3>
-    <div className="prose prose-indigo max-w-none">
-      <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-        {course.moTa}
+    
+    {/* Video minh họa */}
+    <div className="mb-6">
+      <h4 className="text-md font-semibold text-gray-800 mb-3 flex items-center space-x-2">
+        <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"/>
+        </svg>
+        <span>Video giới thiệu khóa học</span>
+      </h4>
+      <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-900">
+        <iframe
+          src="https://www.youtube.com/embed/7CqJlxBYj-M"
+          title="Video giới thiệu khóa học"
+          className="absolute inset-0 w-full h-full"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      </div>
+      <p className="text-sm text-gray-600 mt-2 text-center">
+        Video giới thiệu tổng quan về khóa học
       </p>
+    </div>
+
+    {/* Mô tả chi tiết */}
+    <div className="prose prose-indigo max-w-none">
+      <h4 className="text-md font-semibold text-gray-800 mb-3">📚 Giới thiệu khóa học</h4>
+      <div className="text-gray-700 leading-relaxed space-y-4">
+        <p>
+          <strong>Khóa học {course.tenKhoaHoc || "Lập trình Fullstack"}</strong> được thiết kế 
+          toàn diện từ cơ bản đến nâng cao, giúp học viên nắm vững kiến thức và kỹ năng cần thiết 
+          để trở thành một lập trình viên chuyên nghiệp.
+        </p>
+
+        <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+          <h5 className="font-semibold text-blue-800 mb-2">🎯 Mục tiêu khóa học</h5>
+          <ul className="text-blue-700 space-y-1">
+            <li>• Nắm vững kiến thức nền tảng về lập trình</li>
+            <li>• Thành thạo các công nghệ Frontend và Backend</li>
+            <li>• Có khả năng xây dựng ứng dụng web hoàn chỉnh</li>
+            <li>• Rèn luyện tư duy giải quyết vấn đề</li>
+            <li>• Chuẩn bị cho công việc thực tế tại doanh nghiệp</li>
+          </ul>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4 mt-4">
+          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+            <h6 className="font-semibold text-green-800 mb-2 flex items-center">
+              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              </svg>
+              Đối tượng phù hợp
+            </h6>
+            <ul className="text-green-700 text-sm space-y-1">
+              <li>• Người mới bắt đầu học lập trình</li>
+              <li>• Sinh viên CNTT</li>
+              <li>• Developer muốn học thêm stack mới</li>
+              <li>• Người muốn chuyển ngành IT</li>
+            </ul>
+          </div>
+
+          <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+            <h6 className="font-semibold text-purple-800 mb-2 flex items-center">
+              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              Lợi ích đạt được
+            </h6>
+            <ul className="text-purple-700 text-sm space-y-1">
+              <li>• Kiến thức toàn diện Fullstack</li>
+              <li>• Dự án thực tế trong portfolio</li>
+              <li>• Hỗ trợ mentor 1:1</li>
+              <li>• Certificate có giá trị</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded mt-4">
+          <h5 className="font-semibold text-yellow-800 mb-2">⏱️ Thông tin khóa học</h5>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+            <div className="text-center">
+              <div className="font-semibold text-yellow-700">Thời lượng</div>
+              <div className="text-yellow-600">3-6 tháng</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold text-yellow-700">Bài học</div>
+              <div className="text-yellow-600">120+ bài</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold text-yellow-700">Dự án</div>
+              <div className="text-yellow-600">5+ dự án</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold text-yellow-700">Hình thức</div>
+              <div className="text-yellow-600">Online</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Nội dung mô tả từ API (nếu có) */}
+        {course.moTa && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <h5 className="font-semibold text-gray-800 mb-2">📖 Nội dung chi tiết</h5>
+            <p className="text-gray-700 whitespace-pre-line">
+              {course.moTa}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   </div>
 );
+
 
 // Related Courses Section Component
 const RelatedCoursesSection = ({ relatedCourses, loadingRelated, onCourseClick, navigate }) => (
@@ -604,11 +709,13 @@ const RelatedCoursesSection = ({ relatedCourses, loadingRelated, onCourseClick, 
             onClick={() => onCourseClick(relatedCourse.maKhoaHoc)}
             className="flex items-center space-x-4 p-3 rounded-lg border border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all duration-200 cursor-pointer group"
           >
-            <img
-              src={relatedCourse.hinhAnh}
-              alt={relatedCourse.tenKhoaHoc}
-              className="w-16 h-12 object-cover rounded-lg group-hover:scale-105 transition-transform duration-200"
-            />
+            {/* Ảnh tượng trưng cố định */}
+            <div className="w-16 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-200">
+              <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+            </div>
+            
             <div className="flex-1 min-w-0">
               <h4 className="font-medium text-gray-900 truncate group-hover:text-indigo-600 transition-colors duration-200">
                 {relatedCourse.tenKhoaHoc}
@@ -624,9 +731,11 @@ const RelatedCoursesSection = ({ relatedCourses, loadingRelated, onCourseClick, 
       </div>
     ) : (
       <div className="text-center py-8 text-gray-500">
-        <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10z" />
-        </svg>
+        <div className="w-16 h-16 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10z" />
+          </svg>
+        </div>
         <p className="text-gray-600 mb-4">Chưa có khóa học liên quan</p>
         <button
           onClick={() => navigate('/courses')}

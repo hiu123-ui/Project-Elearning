@@ -4,17 +4,21 @@ import { useNavigate } from 'react-router-dom';
 import {
   fetchEnrolledCourses,
   fetchUserInfoWithCourses,
-  unenrollCourseAction // THÊM DÒNG NÀY
+  unenrollCourseAction
 } from '../../stores/course/courseActions';
+
 const MyCoursesPage = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('all');
   const { infoUser } = useSelector((state) => state.userSlice);
+  
+  // SỬA LẠI: Lấy enrolledCourses từ courseSlice thay vì từ userSlice
   const enrolledCourses = useSelector((state) => state.courseSlice.enrolledCourses);
+  
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Danh sách ảnh fallback chất lượng cao - THÊM VÀO
+  // Danh sách ảnh fallback chất lượng cao
   const fallbackImages = [
     "https://vtiacademy.edu.vn/upload/images/anh-link/review-khoa-hoc-tester.jpg",
     "https://img.freepik.com/free-photo/programming-background-collage_23-2149901783.jpg",
@@ -26,7 +30,7 @@ const MyCoursesPage = () => {
     "https://img.freepik.com/free-photo/developing-programming-coding-technologies_53876-121526.jpg"
   ];
 
-  // Hàm lấy tiến độ - THÊM VÀO
+  // Hàm lấy tiến độ
   const getProgress = useCallback((course) => {
     const randomSeed = course.maKhoaHoc ?
       course.maKhoaHoc.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) :
@@ -35,13 +39,14 @@ const MyCoursesPage = () => {
     return Math.floor(randomSeed % 101);
   }, []);
 
-    const scrollToTop = () => {
+  const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
   };
-  // Hàm xác định trạng thái khóa học - THÊM VÀO
+
+  // Hàm xác định trạng thái khóa học
   const getCourseStatus = useCallback((course) => {
     const progress = getProgress(course);
     if (progress === 0) return 'not-started';
@@ -60,7 +65,7 @@ const MyCoursesPage = () => {
     }
   }, [enrolledCourses, infoUser]);
 
-  // Hàm fetch dữ liệu từ Redux
+  // Hàm fetch dữ liệu từ Redux - SỬA LẠI
   const fetchEnrolledCoursesData = useCallback(async () => {
     if (!infoUser) {
       console.log('⚠️ Không có thông tin user, không fetch enrolled courses');
@@ -71,7 +76,14 @@ const MyCoursesPage = () => {
     setLoading(true);
     try {
       console.log('🔄 Đang fetch enrolled courses từ user info...');
+      
+      // SỬA LẠI: Gọi action để fetch thông tin user với khóa học
       await dispatch(fetchUserInfoWithCourses());
+      
+      // Kiểm tra lại sau khi fetch
+      const currentState = store.getState();
+      console.log('🔄 State sau khi fetch:', currentState.courseSlice.enrolledCourses);
+      
     } catch (error) {
       console.error('❌ Lỗi tải khóa học:', error);
     } finally {
@@ -121,8 +133,13 @@ const MyCoursesPage = () => {
     window.dispatchEvent(event);
   };
 
+  // SỬA LẠI: Xử lý trường hợp enrolledCourses không phải là mảng
+  const coursesArray = Array.isArray(enrolledCourses) ? enrolledCourses : [];
+
   // Filter courses theo tab
-  const filteredCourses = enrolledCourses.filter(course => {
+  const filteredCourses = coursesArray.filter(course => {
+    if (!course || !course.maKhoaHoc) return false;
+    
     if (activeTab === 'all') return true;
     if (activeTab === 'in-progress') {
       const progress = getProgress(course);
@@ -145,7 +162,7 @@ const MyCoursesPage = () => {
 
     } catch (error) {
       console.error('❌ Lỗi khi hủy đăng ký:', error);
-      throw error; // Re-throw để component con xử lý
+      throw error;
     }
   };
 
@@ -188,44 +205,33 @@ const MyCoursesPage = () => {
                 </svg>
                 Làm mới
               </button>
-
-              {/* Nút tìm khóa học mới */}
-              <button
-                onClick={() => navigate('/courses')}
-                className="group relative bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-8 py-4 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Tìm khóa học mới
-              </button>
             </div>
           </div>
 
-          {/* Stats Cards */}
+          {/* Stats Cards - SỬA LẠI: Sử dụng coursesArray */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {[
               {
                 label: 'Tổng số khóa học',
-                value: enrolledCourses.length,
+                value: coursesArray.length,
                 color: 'from-gray-500 to-gray-600',
                 icon: '📚'
               },
               {
                 label: 'Đã hoàn thành',
-                value: enrolledCourses.filter(c => getCourseStatus(c) === 'completed').length,
+                value: coursesArray.filter(c => getCourseStatus(c) === 'completed').length,
                 color: 'from-green-500 to-green-600',
                 icon: '✅'
               },
               {
                 label: 'Đang học',
-                value: enrolledCourses.filter(c => getCourseStatus(c) === 'in-progress').length,
+                value: coursesArray.filter(c => getCourseStatus(c) === 'in-progress').length,
                 color: 'from-blue-500 to-blue-600',
                 icon: '📖'
               },
               {
                 label: 'Chưa bắt đầu',
-                value: enrolledCourses.filter(c => getCourseStatus(c) === 'not-started').length,
+                value: coursesArray.filter(c => getCourseStatus(c) === 'not-started').length,
                 color: 'from-orange-500 to-orange-600',
                 icon: '⏳'
               }
@@ -245,13 +251,13 @@ const MyCoursesPage = () => {
           </div>
         </div>
 
-        {/* Enhanced Tabs Section */}
+        {/* Enhanced Tabs Section - SỬA LẠI: Sử dụng coursesArray */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-200/60 mb-8 overflow-hidden">
           <div className="flex flex-wrap border-b border-gray-200/60">
             {[
-              { id: 'all', label: 'Tất cả', count: enrolledCourses.length, icon: '🌐' },
-              { id: 'in-progress', label: 'Đang học', count: enrolledCourses.filter(c => getCourseStatus(c) === 'in-progress').length, icon: '📊' },
-              { id: 'completed', label: 'Đã hoàn thành', count: enrolledCourses.filter(c => getCourseStatus(c) === 'completed').length, icon: '🎓' },
+              { id: 'all', label: 'Tất cả', count: coursesArray.length, icon: '🌐' },
+              { id: 'in-progress', label: 'Đang học', count: coursesArray.filter(c => getCourseStatus(c) === 'in-progress').length, icon: '📊' },
+              { id: 'completed', label: 'Đã hoàn thành', count: coursesArray.filter(c => getCourseStatus(c) === 'completed').length, icon: '🎓' },
             ].map(tab => (
               <button
                 key={tab.id}
@@ -304,12 +310,12 @@ const MyCoursesPage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                 {filteredCourses.map((course, index) => (
                   <CourseCard
-                    key={course.maKhoaHoc}
+                    key={course.maKhoaHoc || index}
                     course={course}
                     progress={getProgress(course)}
                     status={getCourseStatus(course)}
                     onContinue={() => navigate(`/learn/${course.maKhoaHoc}`)}
-                    onUnenroll={handleUnenroll} // THÊM PROP NÀY
+                    onUnenroll={handleUnenroll}
                     imageUrl={course.hinhAnh}
                     fallbackImages={fallbackImages}
                   />
@@ -457,7 +463,7 @@ const CourseCard = ({ course, progress, status, onContinue, imageUrl, fallbackIm
         {/* Nút hành động */}
         <div className="flex gap-2">
           <button
-            onClick={() => window.location.href = 'https://www.youtube.com/@CyberSoftAcademy'}
+            onClick={onContinue}
             className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3.5 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center gap-2 group/btn"
           >
             <svg className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">

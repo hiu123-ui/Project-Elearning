@@ -22,16 +22,17 @@ export const userService = {
         return axiosCustom.post('/QuanLyNguoiDung/ThongTinNguoiDung');
     },
 
-    // Cập nhật service với xử lý lỗi chi tiết
+    // Cập nhật service với xử lý lỗi chi tiết và chuẩn hóa dữ liệu
     updateUserInfo: async (userInfo) => {
         try {
+            // Chuẩn hóa dữ liệu trước khi gửi lên server
             const formattedData = {
                 taiKhoan: userInfo.taiKhoan,
                 matKhau: userInfo.matKhau || '', // Có thể để trống nếu không đổi
-                hoTen: userInfo.hoTen,
-                soDT: userInfo.soDT,
+                hoTen: userInfo.hoTen.trim(),
+                soDT: userInfo.soDT.trim(), // Đảm bảo cắt bỏ khoảng trắng
                 maNhom: userInfo.maNhom,
-                email: userInfo.email,
+                email: userInfo.email.trim(),
                 maLoaiNguoiDung: userInfo.maLoaiNguoiDung
             };
 
@@ -40,6 +41,13 @@ export const userService = {
             // Thêm token vào response nếu cần
             if (response.data && !response.data.accessToken) {
                 response.data.accessToken = userInfo.accessToken;
+            }
+            
+            // Đảm bảo dữ liệu trả về đã được chuẩn hóa
+            if (response.data) {
+                response.data.soDT = response.data.soDT?.trim() || '';
+                response.data.hoTen = response.data.hoTen?.trim() || '';
+                response.data.email = response.data.email?.trim() || '';
             }
             
             return response;
@@ -51,14 +59,4 @@ export const userService = {
             throw new Error(errorMessage);
         }
     },
-
-    // Thêm hàm kiểm tra tài khoản tồn tại
-    checkAccountExists: (taiKhoan) => {
-        return axiosCustom.get(`/QuanLyNguoiDung/TimKiemNguoiDung?tuKhoa=${taiKhoan}`);
-    },
-
-    // Thêm hàm đổi mật khẩu riêng
-    changePassword: (passwordData) => {
-        return axiosCustom.put('/QuanLyNguoiDung/DoiMatKhau', passwordData);
-    }
 };

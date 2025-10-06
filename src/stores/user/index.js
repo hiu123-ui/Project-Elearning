@@ -5,20 +5,79 @@ import { toast } from 'react-toastify';
 
 // Async thunk cho cập nhật thông tin với API thực tế
 export const updateUserInfo = createAsyncThunk(
-  'user/updateInfo',
-  async (userData, { rejectWithValue }) => {
+  'user/updateUserInfo',
+  async (userData, { getState, rejectWithValue }) => {
     try {
-      const response = await userService.updateUserInfo(userData);
+      const state = getState();
+      const token = state.userSlice.infoUser?.accessToken;
       
-      // Kết hợp thông tin mới với accessToken cũ
+      if (!token) {
+        return rejectWithValue('Không tìm thấy token xác thực');
+      }
+
+      // Tạo payload không chứa accessToken (API không cần)
+      const payload = { 
+        taiKhoan: userData.taiKhoan,
+        matKhau: userData.matKhau || '',
+        hoTen: userData.hoTen,
+        soDT: userData.soDT,
+        maNhom: userData.maNhom,
+        email: userData.email,
+        maLoaiNguoiDung: userData.maLoaiNguoiDung
+      };
+
+      const response = await userService.updateUserInfo(payload);
+      
+      // Kết hợp thông tin mới với token cũ
       const updatedUserInfo = {
         ...response.data,
-        accessToken: userData.accessToken // Giữ lại token cũ
+        accessToken: token // Giữ nguyên token
       };
       
+      console.log('Cập nhật thành công:', updatedUserInfo);
       return updatedUserInfo;
     } catch (error) {
-      return rejectWithValue(error.message || 'Cập nhật thông tin thất bại');
+      console.error('Lỗi khi cập nhật:', error);
+      return rejectWithValue(
+        error.message || 
+        'Cập nhật thông tin thất bại'
+      );
+    }
+  }
+);
+
+// Async thunk để refresh thông tin user - ĐÃ SỬA LỖI
+export const refreshUserInfo = createAsyncThunk(
+  'user/refreshInfo',
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { infoUser } = getState().userSlice;
+      if (!infoUser?.taiKhoan) {
+        throw new Error('Không tìm thấy thông tin user');
+      }
+
+      // Sử dụng getUserInfo thay vì getUserDetail (nếu API có)
+      const response = await userService.getUserInfo();
+      const refreshedInfo = {
+        ...response.data,
+        accessToken: infoUser.accessToken // Giữ nguyên token
+      };
+      
+      return refreshedInfo;
+    } catch (error) {
+      console.error('Lỗi refresh user info:', error);
+      // Fallback: sử dụng getUserDetail nếu getUserInfo không tồn tại
+      try {
+        const { infoUser } = getState().userSlice;
+        const response = await userService.getUserDetail(infoUser.taiKhoan);
+        const refreshedInfo = {
+          ...response.data,
+          accessToken: infoUser.accessToken
+        };
+        return refreshedInfo;
+      } catch (fallbackError) {
+        return rejectWithValue('Làm mới thông tin thất bại');
+      }
     }
   }
 );
@@ -63,7 +122,8 @@ const initialState = {
   error: null,
   registerSuccess: false,
   updateLoading: false,
-  updateSuccess: false
+  updateSuccess: false,
+  refreshLoading: false
 };
 
 const userSlice = createSlice({
@@ -87,6 +147,13 @@ const userSlice = createSlice({
       state.infoUser = null;
       LocalStorage.remove(keyLocalStorage.INFO_USER);
       toast.info('Đã đăng xuất');
+    },
+    // Thêm reducer để cập nhật partial info
+    updatePartialInfo: (state, action) => {
+      if (state.infoUser) {
+        state.infoUser = { ...state.infoUser, ...action.payload };
+        LocalStorage.set(keyLocalStorage.INFO_USER, state.infoUser);
+      }
     }
   },
   extraReducers: (builder) => {
@@ -110,6 +177,21 @@ const userSlice = createSlice({
         state.updateSuccess = false;
         state.error = action.payload;
         toast.error(`❌ ${action.payload}`);
+      })
+      // Xử lý refresh thông tin
+      .addCase(refreshUserInfo.pending, (state) => {
+        state.refreshLoading = true;
+      })
+      .addCase(refreshUserInfo.fulfilled, (state, action) => {
+        state.refreshLoading = false;
+        state.infoUser = action.payload;
+        LocalStorage.set(keyLocalStorage.INFO_USER, action.payload);
+        toast.info('🔄 Đã làm mới thông tin');
+      })
+      .addCase(refreshUserInfo.rejected, (state, action) => {
+        state.refreshLoading = false;
+        console.error('Refresh user info failed:', action.payload);
+        toast.error('❌ Làm mới thông tin thất bại');
       })
       // Xử lý đăng ký
       .addCase(registerUser.pending, (state) => {
@@ -150,7 +232,8 @@ export const {
   clearRegisterSuccess, 
   clearError, 
   clearUpdateSuccess,
-  logout 
+  logout,
+  updatePartialInfo
 } = userSlice.actions;
 
 export default userSlice.reducer;

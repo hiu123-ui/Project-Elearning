@@ -5,16 +5,19 @@ import RegisterPage from "../page/register";
 import CourseDetailPage from "../page/course-detail";
 import Hometemplate from "../templates/Hometemplate";
 import AuthTemplate from "../templates/AuthTemplate";
-import { Route, Navigate } from "react-router-dom"; // thêm Navigate
+import { Route, Navigate } from "react-router-dom";
 import React from "react";
 import CoursePages from "../page/course-page";
 import EventPage from "../page/event/EventPage";
 import BlogPage from "../page/blog/BlogPage";
 import InfoPage from "../page/info/InfoPage";
 import SearchPage from "../page/search";
-import { useSelector } from "react-redux"; // thêm useSelector
+import { useSelector } from "react-redux";
 import MyCoursesPage from "../page/mycourse";
 import ProfilePage from "../page/profile";
+import Course from "../page/course/Course";
+import NotFoundPage from "../page/notfound/NotFoundPage";
+
 
 // GuestOnlyLayout: chặn người đã đăng nhập vào nhóm route Auth (login/register)
 function GuestOnlyLayout() {
@@ -37,12 +40,13 @@ function RequireAuth({ children }) {
 }
 
 const routers = [
+ 
     {
         path: "",
         element: <Hometemplate />,
         children: [
             {
-                path: "",
+                path: "/",
                 element: <HomePage />
             },
             {
@@ -66,6 +70,10 @@ const routers = [
                 element: <InfoPage />
             },
             {
+                path: "/course",
+                element: <Course />
+            },
+            {
                 path: "/search",
                 element: <SearchPage />
             },
@@ -77,13 +85,17 @@ const routers = [
                 path: "/profile",
                 element: <RequireAuth><ProfilePage /></RequireAuth>
             },
+            // Thêm route 404 cho các route con không tồn tại
+            {
+                path: "*",
+                element: <NotFoundPage />
+            }
         ]
     },
     // Auth routes as separate routes
     {
         path: "",
-        element: <GuestOnlyLayout />, // đổi từ <AuthTemplate /> sang GuestOnlyLayout
-
+        element: <GuestOnlyLayout />,
         children: [
             {
                 path: "/login",
@@ -95,6 +107,11 @@ const routers = [
             }
         ]
     },
+    // Route 404 chung cho tất cả các route không khớp
+    {
+        path: "*",
+        element: <NotFoundPage />
+    }
 ];
 
 export const renderRouters = () => {

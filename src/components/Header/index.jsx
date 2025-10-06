@@ -155,7 +155,7 @@ const HeaderPages = () => {
                 aria-label="Trang chủ"
             >
                 <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
-                    ELEARNING
+                    E-LEARNING
                 </span>
             </div>
 
@@ -166,6 +166,7 @@ const HeaderPages = () => {
                     { path: "/blog", label: "Blog", icon: "📝" },
                     { path: "/events", label: "Sự kiện", icon: "🎉" },
                     { path: "/info", label: "Thông tin", icon: "ℹ️" },
+                
                 ].map((item) => (
                     <button
                         key={item.path}
@@ -188,7 +189,12 @@ const HeaderPages = () => {
                     className="flex items-center gap-1 hover:text-blue-500 transition-all duration-200 ease-in-out hover:scale-105 will-change-transform will-change-color "
                     aria-expanded={showMenu}
                     aria-haspopup="true"
-                    onClick={() => setShowMenu(!showMenu)}
+                    onClick={() => {
+                        setShowMenu(!showMenu);
+                        if (!showMenu) {
+                            handleNavigate("/course");
+                        }
+                    }}
                 >
                         <span className="text-sm">📚</span>
                         Khóa học
@@ -208,6 +214,21 @@ const HeaderPages = () => {
                             <div className="p-2 border-b border-gray-100">
                                 <h3 className="font-semibold text-gray-700 text-sm">Danh mục khóa học</h3>
                             </div>
+                            {/* Thêm nút "Tất cả khóa học" */}
+                            <button
+                                onClick={() => {
+                                    navigate("/course");
+                                    setShowMenu(false);
+                                    scrollToTop();
+                                }}
+                                className="w-full px-4 py-3 text-left bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors duration-150 flex items-center gap-3 group border-b border-gray-100"
+                            >
+                                <div className="w-2 h-2 bg-blue-500 rounded-full group-hover:scale-150 transition-transform"></div>
+                                <span className="flex-1 text-sm font-medium">Tất cả khóa học</span>
+                                <svg width="12" height="12" fill="none" stroke="currentColor" className="opacity-100">
+                                    <path d="M5 2l4 4-4 4" />
+                                </svg>
+                            </button>
                             <div className="max-h-64 overflow-y-auto">
                                 {loading ? (
                                     <div className="p-4 text-center">
@@ -496,7 +517,9 @@ const HeaderPages = () => {
                                 { path: "/", label: "🏠 Trang chủ" },
                                 { path: "/blog", label: "📝 Blog" },
                                 { path: "/events", label: "🎉 Sự kiện" },
-                                { path: "/info", label: "ℹ️ Thông tin" }
+                                { path: "/info", label: "ℹ️ Thông tin" },
+                                { path: "/course", label: "📚 Khóa học" },
+
                             ].map((item) => (
                                 <button
                                     key={item.path}

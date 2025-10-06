@@ -25,7 +25,7 @@ export const courseService = {
     },
 
     // Hủy ghi danh
-     unenrollCourse: (data) => {
+    unenrollCourse: (data) => {
         return axiosCustom.post('/QuanLyKhoaHoc/HuyGhiDanh', data);
     },
 
@@ -37,16 +37,15 @@ export const courseService = {
         });
     },
     
-    // QUAN TRỌNG: Sửa lại hàm getEnrolledCourses - sử dụng API lấy thông tin tài khoản
-    getEnrolledCourses: () => {
-        // Sử dụng API lấy thông tin tài khoản, vì thông tin khóa học đã đăng ký có trong user info
-        return axiosCustom.post('/QuanLyNguoiDung/ThongTinTaiKhoan');
-    },
-    
-    // Hoặc nếu có API riêng cho khóa học đã đăng ký
-    getCoursesByUser: (taiKhoan) => {
+
+    getEnrolledCourses: (taiKhoan) => {
         return axiosCustom.post('/QuanLyNguoiDung/LayDanhSachKhoaHocDaGhiDanh', {
             taiKhoan: taiKhoan
         });
+    },
+    
+
+    getUserInfo: () => {
+        return axiosCustom.post('/QuanLyNguoiDung/ThongTinTaiKhoan');
     }
 }
