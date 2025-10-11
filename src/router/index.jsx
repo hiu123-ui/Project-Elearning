@@ -17,6 +17,7 @@ import MyCoursesPage from "../page/mycourse";
 import ProfilePage from "../page/profile";
 import Course from "../page/course/Course";
 import NotFoundPage from "../page/notfound/NotFoundPage";
+import AdminTemplate from "../templates/AdminTemplate";
 
 
 // GuestOnlyLayout: chặn người đã đăng nhập vào nhóm route Auth (login/register)
@@ -40,7 +41,7 @@ function RequireAuth({ children }) {
 }
 
 const routers = [
- 
+
     {
         path: "",
         element: <Hometemplate />,
@@ -111,6 +112,24 @@ const routers = [
     {
         path: "*",
         element: <NotFoundPage />
+    },
+    {
+        path: "/admin",
+        element: <AdminTemplate />,
+        children: [
+            {
+                path: "",
+                element: <LoginPage />
+            },
+            {
+                path: "/course",
+                element: <RegisterPage />
+            },
+            {
+                path: "/user",
+                element: <RegisterPage />
+            }
+        ]
     }
 ];
 
