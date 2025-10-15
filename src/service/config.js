@@ -2,7 +2,6 @@ import axios from "axios";
 import { keyLocalStorage, LocalStorage } from "../ultil/localStorage";
 
 const BASE_URL = 'https://elearningnew.cybersoft.edu.vn/api';
-
 export const axiosCustom = axios.create({
   baseURL: BASE_URL,
 });

@@ -18,6 +18,9 @@ import ProfilePage from "../page/profile";
 import Course from "../page/course/Course";
 import NotFoundPage from "../page/notfound/NotFoundPage";
 import AdminTemplate from "../templates/AdminTemplate";
+import DashboardPage from "../page/admin/dashboard/Index";
+import CoursePageAdmin from "../page/admin/course/Index";
+import UserPageAdmin from "../page/admin/user/Index";
 
 
 // GuestOnlyLayout: chặn người đã đăng nhập vào nhóm route Auth (login/register)
@@ -119,15 +122,15 @@ const routers = [
         children: [
             {
                 path: "",
-                element: <LoginPage />
+                element: <DashboardPage />
             },
             {
-                path: "/course",
-                element: <RegisterPage />
+                path: "course",
+                element: <CoursePageAdmin />
             },
             {
-                path: "/user",
-                element: <RegisterPage />
+                path: "user",
+                element: <UserPageAdmin />
             }
         ]
     }
