@@ -117,7 +117,7 @@ const routers = [
         element: <NotFoundPage />
     },
     {
-        path: "/admin",
+        path: "admin",
         element: <AdminTemplate />,
         children: [
             {
