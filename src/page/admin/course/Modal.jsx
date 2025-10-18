@@ -3,8 +3,9 @@ import { UploadOutlined } from "@ant-design/icons";
 import { courseService } from "../../../service/courseService";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { notyf } from "../../../ultil/notyf";
 
-export default function ModalThemKhoaHoc({ onClose }) {
+export default function ModalThemKhoaHoc({ onSuccess  }) {
   const [form] = Form.useForm();
   const [categories, setCategories] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
@@ -48,7 +49,7 @@ export default function ModalThemKhoaHoc({ onClose }) {
         taiKhoanNguoiTao: infoUser?.taiKhoan || "admin",
       };
       await courseService.addCourse(payload);
-      message.success("✅ Thêm khóa học thành công!");
+      notyf.success("Thêm khóa học thành công!");
       const file = values.hinhAnh?.[0]?.originFileObj;
       if (file) {
         const maNhom = values.maNhom || "GP01";
@@ -62,10 +63,10 @@ export default function ModalThemKhoaHoc({ onClose }) {
       }
 
       form.resetFields();
-      onClose?.();
+      onSuccess?.();
     } catch (error) {
+      notyf.error(error.response?.data);
       console.error("❌ Lỗi khi thêm khóa học:", error.response?.data || error);
-      message.error(error.response?.data || "Không thể thêm khóa học!");
     }
   };
 
@@ -140,8 +141,7 @@ export default function ModalThemKhoaHoc({ onClose }) {
           className="mt-2 w-32 h-32 object-cover rounded border"
         />
       )}
-
-      <Button type="primary" htmlType="submit" block>
+      <Button type="primary" htmlType="submit" block className="mt-4">
         Thêm khóa học
       </Button>
     </Form>

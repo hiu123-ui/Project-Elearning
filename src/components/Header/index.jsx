@@ -166,7 +166,7 @@ const HeaderPages = () => {
                     { path: "/blog", label: "Blog", icon: "📝" },
                     { path: "/events", label: "Sự kiện", icon: "🎉" },
                     { path: "/info", label: "Thông tin", icon: "ℹ️" },
-                
+
                 ].map((item) => (
                     <button
                         key={item.path}
@@ -363,7 +363,9 @@ const HeaderPages = () => {
                                 {[
                                     { path: "/profile", label: "👤 Hồ sơ cá nhân", action: "/profile" },
                                     { path: "/my-courses", label: "📚 Khóa học của tôi", action: "/my-courses" },
-                                  
+                                    ...(infoUser.maLoaiNguoiDung === "GV"
+                                        ? [{ path: "/admin", label: "🛠️ Trang Quản Trị", action: "/admin" }]
+                                        : []),
                                 ].map((item) => (
                                     <button
                                         key={item.path}

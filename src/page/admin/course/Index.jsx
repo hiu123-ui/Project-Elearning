@@ -3,6 +3,7 @@ import { Modal, Pagination } from "antd";
 import { courseService } from "../../../service/courseService";
 import ModalThemKhoaHoc from "./Modal";
 import CourseTable from "./CourseTable";
+import { notyf } from "../../../ultil/notyf";
 
 const CoursePageAdmin = () => {
   const [allCourses, setAllCourses] = useState([]); // toàn bộ danh sách
@@ -57,7 +58,6 @@ const CoursePageAdmin = () => {
     const value = e.target.value.toLowerCase();
     setSearchTerm(value);
     setSearchPage(1); // reset về trang đầu khi gõ tìm kiếm
-
     if (value.trim() === "") {
       // nếu rỗng → quay lại dữ liệu phân trang API
       fetchListCoursePagination(page);
@@ -73,6 +73,11 @@ const CoursePageAdmin = () => {
 
     setFilteredCourses(filtered);
     setTotalCount(filtered.length);
+    if (filtered.length > 0) {
+      notyf.success("Tìm kiếm thành công!");
+    } else {
+      notyf.error("Không tìm thấy dữ liệu phù hợp!");
+    }
   };
   const showModal = () => {
     setIsModalOpen(true);
@@ -81,6 +86,9 @@ const CoursePageAdmin = () => {
     setIsModalOpen(false);
   };
   const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+  const handleSuccess = () => {
     setIsModalOpen(false);
   };
   // 🧩 Dữ liệu hiển thị (tự cắt nếu đang tìm kiếm)
@@ -153,13 +161,14 @@ const CoursePageAdmin = () => {
           )}
         </div>
         <Modal
-          title="Basic Modal"
+          title="Thêm Mới Khóa Học"
           closable={{ 'aria-label': 'Custom Close Button' }}
           open={isModalOpen}
           onOk={handleOk}
           onCancel={handleCancel}
+          footer={null}
         >
-          <ModalThemKhoaHoc />
+          <ModalThemKhoaHoc onSuccess={handleSuccess} />
         </Modal>
         {/* Modal thêm khóa học */}
       </div>
