@@ -4,6 +4,7 @@ import { courseService } from "../../../service/courseService";
 import ModalThemKhoaHoc from "./Modal";
 import CourseTable from "./CourseTable";
 import { notyf } from "../../../ultil/notyf";
+import Swal from "sweetalert2";
 
 const CoursePageAdmin = () => {
   const [allCourses, setAllCourses] = useState([]); // toàn bộ danh sách
@@ -16,7 +17,7 @@ const CoursePageAdmin = () => {
   const [dataList, setDataList] = useState({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const pageSize = 10;
-
+  const [selectedCourse, setSelectedCourse] = useState(null);
   // 🧩 Lấy toàn bộ dữ liệu (chỉ dùng cho tìm kiếm)
   const fetchListCourse = async () => {
     try {
@@ -36,6 +37,7 @@ const CoursePageAdmin = () => {
       setFilteredCourses(res.data.items || []);
       setTotalCount(res.data.totalCount || 0);
       setDataList(res.data);
+      console.log("data:",res.data);
     } catch (error) {
       console.log(error);
     }
@@ -90,6 +92,8 @@ const CoursePageAdmin = () => {
   };
   const handleSuccess = () => {
     setIsModalOpen(false);
+    setSelectedCourse(null);
+    fetchListCoursePagination(page);
   };
   // 🧩 Dữ liệu hiển thị (tự cắt nếu đang tìm kiếm)
   const displayCourses =
@@ -99,6 +103,43 @@ const CoursePageAdmin = () => {
         (searchPage - 1) * pageSize,
         searchPage * pageSize
       ); // phân trang
+  const handleDelete = async (courseID) => {
+    const confirm = await Swal.fire({
+      title: "Bạn có chắc muốn xóa?",
+      text: "Hành động này không thể hoàn tác!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    });
+
+    if (confirm.isConfirmed) {
+      try {
+        await courseService.deleteCource(courseID);
+        notyf.success("Xóa Khóa Học Thành Công");
+        if (searchTerm.trim() === "") {
+          // Nếu không tìm kiếm → gọi lại API phân trang
+          await fetchListCoursePagination(page);
+        } else {
+          // Nếu đang ở chế độ tìm kiếm → tải lại toàn bộ để lọc lại
+          await fetchListCourse();
+          const filtered = allCourses.filter(
+            (course) =>
+              course.tenKhoaHoc.toLowerCase().includes(searchTerm.toLowerCase()) ||
+              course.maKhoaHoc.toLowerCase().includes(searchTerm.toLowerCase())
+          );
+          setFilteredCourses(filtered);
+          setTotalCount(filtered.length);
+        }
+      } catch (error) {
+        notyf.error(error.response.data);
+      }
+    }
+  };
+  const handleEdit = (course) => {
+    setSelectedCourse(course);
+    setIsModalOpen(true);
+  };
   return (
     <div>
       <h3 className="text-3xl mb-6">
@@ -133,8 +174,8 @@ const CoursePageAdmin = () => {
         {/* table - list danh sách khóa học */}
         <CourseTable
           courses={displayCourses}
-          onEdit={(c) => console.log("Sửa:", c)}
-          onDelete={(id) => console.log("Xóa:", id)}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
           onAssign={(c) => console.log("Ghi danh:", c)}
         />
 
@@ -168,7 +209,10 @@ const CoursePageAdmin = () => {
           onCancel={handleCancel}
           footer={null}
         >
-          <ModalThemKhoaHoc onSuccess={handleSuccess} />
+          <ModalThemKhoaHoc
+            selectedCourse={selectedCourse}
+            onSuccess={handleSuccess}
+          />
         </Modal>
         {/* Modal thêm khóa học */}
       </div>

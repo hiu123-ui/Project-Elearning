@@ -15,7 +15,6 @@ const CourseTable = ({ courses, onEdit, onDelete, onAssign }) => {
                         <th className="px-4 py-2 border-b text-center">Thao tác</th>
                     </tr>
                 </thead>
-
                 <tbody>
                     {courses.length > 0 ? (
                         courses.map((course) => (
@@ -33,21 +32,27 @@ const CourseTable = ({ courses, onEdit, onDelete, onAssign }) => {
                                         className="w-16 h-16 object-cover rounded"
                                         onError={(e) => {
                                             const img = e.target;
+                                            img.onerror = null; // tránh lặp sự kiện
                                             const originalSrc = img.src;
-                                            img.onerror = null; // tránh lặp vô hạn
-
+                                            const maNhom = (course.maNhom || "gp01").toLowerCase();
                                             try {
+                                                if (originalSrc.includes(`_${maNhom}`)) {
+                                                    img.src = "/images/default.jpg";
+                                                    return;
+                                                }
                                                 const dotIndex = originalSrc.lastIndexOf(".");
-                                                const maNhom = (course.maNhom || "gp01").toLowerCase();
-
-                                                // thêm _gp01 nếu ảnh chính lỗi
                                                 const fallbackSrc =
                                                     dotIndex !== -1
                                                         ? `${originalSrc.substring(0, dotIndex)}_${maNhom}${originalSrc.substring(dotIndex)}`
                                                         : `${originalSrc}_${maNhom}`;
 
                                                 img.src = fallbackSrc;
-                                                img.onerror = () => (img.src = "/images/default.jpg");
+
+                                                // Nếu fallback lỗi → đổi sang default, và không gọi thêm nữa
+                                                img.onerror = () => {
+                                                    img.onerror = null;
+                                                    img.src = "/images/default.jpg";
+                                                };
                                             } catch {
                                                 img.src = "/images/default.jpg";
                                             }
@@ -98,5 +103,4 @@ const CourseTable = ({ courses, onEdit, onDelete, onAssign }) => {
         </div>
     );
 };
-
 export default CourseTable;

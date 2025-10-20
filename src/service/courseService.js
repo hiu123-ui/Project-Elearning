@@ -19,17 +19,14 @@ export const courseService = {
     searchCourses: (searchTerm) => {
         return axiosCustom.get(`/QuanLyKhoaHoc/LayDanhSachKhoaHoc?MaNhom=GP01&tenKhoaHoc=${encodeURIComponent(searchTerm)}`);
     },
-
     // Đăng ký khóa học
     enrollCourse: (data) => {
         return axiosCustom.post('/QuanLyKhoaHoc/DangKyKhoaHoc', data);
     },
-
     // Hủy ghi danh
     unenrollCourse: (data) => {
         return axiosCustom.post('/QuanLyKhoaHoc/HuyGhiDanh', data);
     },
-
     // Kiểm tra ghi danh
     checkEnrollment: (maKhoaHoc, taiKhoan) => {
         return axiosCustom.post('/QuanLyKhoaHoc/KiemTraGhiDanh', {
@@ -37,19 +34,14 @@ export const courseService = {
             taiKhoan
         });
     },
-
-
     getEnrolledCourses: (taiKhoan) => {
         return axiosCustom.post('/QuanLyNguoiDung/LayDanhSachKhoaHocDaGhiDanh', {
             taiKhoan: taiKhoan
         });
     },
-
-
     getUserInfo: () => {
         return axiosCustom.post('/QuanLyNguoiDung/ThongTinTaiKhoan');
     },
-
     // get api for admin
     getListCoursePagination: (page) => axiosCustom.get("/QuanLyKhoaHoc/LayDanhSachKhoaHoc_PhanTrang", {
         params: {
@@ -81,4 +73,9 @@ export const courseService = {
 
         return true;
     },
+    updateCourse: (data) => {
+        return axiosCustom.put(`/QuanLyKhoaHoc/CapNhatKhoaHoc`, data);
+    },
+    deleteCource: (courceID) =>
+        axiosCustom.delete(`/QuanLyKhoaHoc/XoaKhoaHoc?MaKhoaHoc=${courceID}`),
 }

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { notyf } from "../../../ultil/notyf";
 
-export default function ModalThemKhoaHoc({ onSuccess  }) {
+export default function ModalThemKhoaHoc({ onSuccess, selectedCourse }) {
   const [form] = Form.useForm();
   const [categories, setCategories] = useState([]);
   const [previewImage, setPreviewImage] = useState(null);
@@ -24,6 +24,21 @@ export default function ModalThemKhoaHoc({ onSuccess  }) {
     };
     fetchCategories();
   }, []);
+  useEffect(() => {
+    if (selectedCourse) {
+      form.setFieldsValue({
+        maKhoaHoc: selectedCourse.maKhoaHoc,
+        tenKhoaHoc: selectedCourse.tenKhoaHoc,
+        moTa: selectedCourse.moTa,
+        ngayTao: selectedCourse.ngayTao,
+        luotXem: selectedCourse.luotXem,
+        danhGia: selectedCourse.danhGia,
+        maDanhMucKhoaHoc: selectedCourse.danhMucKhoaHoc?.maDanhMucKhoahoc || "",
+      });
+      setPreviewImage(selectedCourse.hinhAnh);
+    }
+  }, [selectedCourse]);
+
   const normFile = (e) => {
     if (Array.isArray(e)) return e;
     const file = e?.fileList?.[0]?.originFileObj;
@@ -35,6 +50,15 @@ export default function ModalThemKhoaHoc({ onSuccess  }) {
   };
   const onFinish = async (values) => {
     try {
+      const file = values.hinhAnh?.[0]?.originFileObj;
+      let finalFileName = selectedCourse?.hinhAnh;
+      if (file) {
+        const maNhom = values.maNhom || "GP01";
+        const tenKhoaHoc = values.tenKhoaHoc.toLowerCase().replace(/\s+/g, "-");
+        const extension = file.name.substring(file.name.lastIndexOf("."));
+        finalFileName = `${tenKhoaHoc}_${maNhom}${extension}`;
+      }
+
       const payload = {
         maKhoaHoc: values.maKhoaHoc,
         biDanh: values.tenKhoaHoc.toLowerCase().replace(/\s+/g, "-"),
@@ -42,15 +66,21 @@ export default function ModalThemKhoaHoc({ onSuccess  }) {
         moTa: values.moTa || "",
         luotXem: Number(values.luotXem) || 0,
         danhGia: Number(values.danhGia) || 0,
-        hinhAnh: fileName,
+        hinhAnh: finalFileName, // 🔹 Giữ nguyên hình cũ nếu không có file mới
         maNhom: "GP01",
         ngayTao: values.ngayTao,
         maDanhMucKhoaHoc: values.maDanhMucKhoaHoc,
         taiKhoanNguoiTao: infoUser?.taiKhoan || "admin",
       };
-      await courseService.addCourse(payload);
-      notyf.success("Thêm khóa học thành công!");
-      const file = values.hinhAnh?.[0]?.originFileObj;
+
+      if (selectedCourse) {
+        await courseService.updateCourse(payload);
+        notyf.success("Cập nhật khóa học thành công!");
+      } else {
+        await courseService.addCourse(payload);
+        notyf.success("Thêm khóa học thành công!");
+      }
+
       if (file) {
         const maNhom = values.maNhom || "GP01";
         const tenKhoaHoc = values.tenKhoaHoc.toLowerCase().replace(/\s+/g, "-");
@@ -58,15 +88,14 @@ export default function ModalThemKhoaHoc({ onSuccess  }) {
         const renamedFile = new File([file], `${tenKhoaHoc}_${maNhom}${extension}`, { type: file.type });
         await courseService.uploadCourseImage(values.tenKhoaHoc, maNhom, renamedFile);
         message.success("🎉 Hình ảnh đã được tải lên!");
-      } else {
-        message.warning("⚠️ Chưa chọn ảnh để tải lên!");
       }
 
       form.resetFields();
+      setPreviewImage(null);
       onSuccess?.();
     } catch (error) {
-      notyf.error(error.response?.data);
-      console.error("❌ Lỗi khi thêm khóa học:", error.response?.data || error);
+      notyf.error(error.response?.data || "Lỗi khi xử lý khóa học!");
+      console.error("❌ Error:", error.response?.data || error);
     }
   };
 
@@ -142,7 +171,7 @@ export default function ModalThemKhoaHoc({ onSuccess  }) {
         />
       )}
       <Button type="primary" htmlType="submit" block className="mt-4">
-        Thêm khóa học
+        {selectedCourse ? "Cập nhật khóa học" : "Thêm khóa học"}
       </Button>
     </Form>
   );
