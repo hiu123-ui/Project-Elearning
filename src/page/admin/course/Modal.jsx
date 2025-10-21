@@ -101,78 +101,113 @@ export default function ModalThemKhoaHoc({ onSuccess, selectedCourse }) {
 
 
   return (
-    <Form form={form} onFinish={onFinish} layout="vertical">
-      <Form.Item
-        label="Mã khóa học"
-        name="maKhoaHoc"
-        rules={[{ required: true, message: "Vui lòng nhập mã khóa học!" }]}
-      >
-        <Input />
-      </Form.Item>
+    <div>
+      <Form form={form} onFinish={onFinish} layout="vertical">
+        <div className="grid grid-cols-2 gap-4">
+          <Form.Item
+            label="Mã khóa học"
+            name="maKhoaHoc"
+            rules={[{ required: true, message: "Vui lòng nhập mã khóa học!" }]}
+          >
+            <Input />
+          </Form.Item>
 
-      <Form.Item
-        label="Tên khóa học"
-        name="tenKhoaHoc"
-        rules={[{ required: true, message: "Vui lòng nhập tên khóa học!" }]}
-      >
-        <Input />
-      </Form.Item>
+          <Form.Item
+            label="Tên khóa học"
+            name="tenKhoaHoc"
+            rules={[{ required: true, message: "Vui lòng nhập tên khóa học!" }]}
+          >
+            <Input />
+          </Form.Item>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <Form.Item
+            label="Danh mục khóa học"
+            name="maDanhMucKhoaHoc"
+            rules={[{ required: true, message: "Vui lòng chọn danh mục!" }]}
+          >
+            <Select placeholder="Chọn danh mục">
+              {categories.map((cat) => (
+                <Select.Option key={cat.maDanhMuc} value={cat.maDanhMuc}>
+                  {cat.tenDanhMuc}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label="Ngày tạo"
+            name="ngayTao"
+            rules={[{ required: true, message: "Vui lòng nhập ngày tạo!" }]}
+          >
+            <Input placeholder="VD: 14/10/2025" />
+          </Form.Item>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <Form.Item label="Đánh giá" name="danhGia">
+            <Input type="number" />
+          </Form.Item>
 
-      <Form.Item
-        label="Danh mục khóa học"
-        name="maDanhMucKhoaHoc"
-        rules={[{ required: true, message: "Vui lòng chọn danh mục!" }]}
-      >
-        <Select placeholder="Chọn danh mục">
-          {categories.map((cat) => (
-            <Select.Option key={cat.maDanhMuc} value={cat.maDanhMuc}>
-              {cat.tenDanhMuc}
-            </Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
+          <Form.Item label="Lượt xem" name="luotXem">
+            <Input type="number" />
+          </Form.Item>
+        </div>
 
-      <Form.Item label="Mô tả" name="moTa">
-        <Input.TextArea rows={3} />
-      </Form.Item>
+        <Form.Item label="Mô tả" name="moTa">
+          <Input.TextArea rows={3} />
+        </Form.Item>
+        <Form.Item
+          label="Hình ảnh"
+          name="hinhAnh"
+          valuePropName="fileList"
+          getValueFromEvent={normFile}
+        >
+          <Upload beforeUpload={() => false} listType="picture">
+            <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+          </Upload>
+        </Form.Item>
 
-      <Form.Item
-        label="Ngày tạo"
-        name="ngayTao"
-        rules={[{ required: true, message: "Vui lòng nhập ngày tạo!" }]}
-      >
-        <Input placeholder="VD: 14/10/2025" />
-      </Form.Item>
+        {previewImage && (
+          <img
+            src={previewImage}
+            alt="preview"
+            className="mt-2 w-32 h-32 object-cover rounded border"
+            onError={(e) => {
+              const img = e.target;
+              img.onerror = null; // tránh lặp vô hạn
+              const originalSrc = img.src;
+              const maNhom = (selectedCourse?.maNhom || "gp01").toLowerCase();
 
-      <Form.Item label="Đánh giá" name="danhGia">
-        <Input type="number" />
-      </Form.Item>
+              try {
+                // Nếu đã thử thêm _maNhom mà vẫn lỗi thì dùng ảnh mặc định
+                if (originalSrc.includes(`_${maNhom}`)) {
+                  img.src = "/images/default.jpg";
+                  return;
+                }
 
-      <Form.Item label="Lượt xem" name="luotXem">
-        <Input type="number" />
-      </Form.Item>
+                // Thêm hậu tố _maNhom trước phần mở rộng
+                const dotIndex = originalSrc.lastIndexOf(".");
+                const fallbackSrc =
+                  dotIndex !== -1
+                    ? `${originalSrc.substring(0, dotIndex)}_${maNhom}${originalSrc.substring(dotIndex)}`
+                    : `${originalSrc}_${maNhom}`;
 
-      <Form.Item
-        label="Hình ảnh"
-        name="hinhAnh"
-        valuePropName="fileList"
-        getValueFromEvent={normFile}
-      >
-        <Upload beforeUpload={() => false} listType="picture">
-          <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
-        </Upload>
-      </Form.Item>
+                img.src = fallbackSrc;
 
-      {previewImage && (
-        <img
-          src={previewImage}
-          alt="preview"
-          className="mt-2 w-32 h-32 object-cover rounded border"
-        />
-      )}
-      <Button type="primary" htmlType="submit" block className="mt-4">
-        {selectedCourse ? "Cập nhật khóa học" : "Thêm khóa học"}
-      </Button>
-    </Form>
+                // Nếu fallback lỗi thì dùng ảnh mặc định
+                img.onerror = () => {
+                  img.onerror = null;
+                  img.src = "/images/default.jpg";
+                };
+              } catch {
+                img.src = "/images/default.jpg";
+              }
+            }}
+          />
+        )}
+        <Button type="primary" htmlType="submit" block className="mt-4">
+          {selectedCourse ? "Cập nhật khóa học" : "Thêm khóa học"}
+        </Button>
+      </Form>
+    </div>
   );
 }

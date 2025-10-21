@@ -92,8 +92,9 @@ const CoursePageAdmin = () => {
   };
   const handleSuccess = () => {
     setIsModalOpen(false);
-    setSelectedCourse(null);
+    setSelectedCourse(null);  
     fetchListCoursePagination(page);
+    fetchListCourse();
   };
   // 🧩 Dữ liệu hiển thị (tự cắt nếu đang tìm kiếm)
   const displayCourses =

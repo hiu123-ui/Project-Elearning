@@ -37,26 +37,49 @@ export const userService = {
             };
 
             const response = await axiosCustom.put('/QuanLyNguoiDung/CapNhatThongTinNguoiDung', formattedData);
-            
+
             // Thêm token vào response nếu cần
             if (response.data && !response.data.accessToken) {
                 response.data.accessToken = userInfo.accessToken;
             }
-            
+
             // Đảm bảo dữ liệu trả về đã được chuẩn hóa
             if (response.data) {
                 response.data.soDT = response.data.soDT?.trim() || '';
                 response.data.hoTen = response.data.hoTen?.trim() || '';
                 response.data.email = response.data.email?.trim() || '';
             }
-            
+
             return response;
         } catch (error) {
             // Xử lý lỗi chi tiết
-            const errorMessage = error.response?.data?.content || 
-                               error.response?.data?.message || 
-                               'Cập nhật thất bại. Vui lòng thử lại.';
+            const errorMessage = error.response?.data?.content ||
+                error.response?.data?.message ||
+                'Cập nhật thất bại. Vui lòng thử lại.';
             throw new Error(errorMessage);
         }
     },
+    addUser: (userData) => {
+        return axiosCustom.post('QuanLyNguoiDung/ThemNguoiDung', userData);
+    },
+    getListUserPagination: (page) => axiosCustom.get("/QuanLyNguoiDung/LayDanhSachNguoiDung_PhanTrang", {
+        params: {
+            page,
+            pageSize: 10,
+            MaNhom: "GP01",
+        },
+    }),
+    getListUser: () => {
+        return axiosCustom.get('/QuanLyNguoiDung/LayDanhSachNguoiDung');
+    },
+    getListMaLoaiNguoiDung: () => {
+        return axiosCustom.get('/QuanLyNguoiDung/LayDanhSachLoaiNguoiDung');
+    },
+        updateUser: (data) => {
+        return axiosCustom.put(`/QuanLyNguoiDung/CapNhatThongTinNguoiDung`, data);
+    },
+    deleteUser: (userID) => {
+        return axiosCustom.delete(`/QuanLyNguoiDung/XoaNguoiDung?TaiKhoan=${userID}`);
+    }
+
 };
