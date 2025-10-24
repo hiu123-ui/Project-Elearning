@@ -78,4 +78,23 @@ export const courseService = {
     },
     deleteCource: (courceID) =>
         axiosCustom.delete(`/QuanLyKhoaHoc/XoaKhoaHoc?MaKhoaHoc=${courceID}`),
+    getListStudentOfCource: (courseID) => axiosCustom.get(`/QuanLyKhoaHoc/LayThongTinHocVienKhoaHoc?maKhoaHoc=${courseID}`),
+    getPendingStudents: (maKhoaHoc) => {
+        return axiosCustom.post(`/QuanLyNguoiDung/LayDanhSachHocVienChoXetDuyet`, {
+            maKhoaHoc,
+        });
+    },
+    approveStudent: (payload) => {
+        return axiosCustom.post('/QuanLyKhoaHoc/GhiDanhKhoaHoc', payload);
+    },
+    deleteStudent: (payload) => {
+        return axiosCustom.post('/QuanLyKhoaHoc/HuyGhiDanh', payload);
+    },
+    enrollStudent: ({ maKhoaHoc, taiKhoan }) => {
+        return axiosCustom.post('/QuanLyKhoaHoc/GhiDanhKhoaHoc', {
+            maKhoaHoc,
+            taiKhoan,
+        });
+    },
+
 }

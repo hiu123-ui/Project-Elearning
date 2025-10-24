@@ -5,6 +5,7 @@ import ModalThemKhoaHoc from "./Modal";
 import CourseTable from "./CourseTable";
 import { notyf } from "../../../ultil/notyf";
 import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
 
 const CoursePageAdmin = () => {
   const [allCourses, setAllCourses] = useState([]); // toàn bộ danh sách
@@ -18,6 +19,7 @@ const CoursePageAdmin = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const pageSize = 10;
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const navigate = useNavigate();
   // 🧩 Lấy toàn bộ dữ liệu (chỉ dùng cho tìm kiếm)
   const fetchListCourse = async () => {
     try {
@@ -37,7 +39,7 @@ const CoursePageAdmin = () => {
       setFilteredCourses(res.data.items || []);
       setTotalCount(res.data.totalCount || 0);
       setDataList(res.data);
-      console.log("data:",res.data);
+      console.log("data:", res.data);
     } catch (error) {
       console.log(error);
     }
@@ -92,7 +94,7 @@ const CoursePageAdmin = () => {
   };
   const handleSuccess = () => {
     setIsModalOpen(false);
-    setSelectedCourse(null);  
+    setSelectedCourse(null);
     fetchListCoursePagination(page);
     fetchListCourse();
   };
@@ -177,7 +179,7 @@ const CoursePageAdmin = () => {
           courses={displayCourses}
           onEdit={handleEdit}
           onDelete={handleDelete}
-          onAssign={(c) => console.log("Ghi danh:", c)}
+          onAssign={(course) => navigate(`/admin/enroll/${course.maKhoaHoc}`)}
         />
 
         {/* Footer - phân trang */}

@@ -21,6 +21,8 @@ import AdminTemplate from "../templates/AdminTemplate";
 import DashboardPage from "../page/admin/dashboard/Index";
 import CoursePageAdmin from "../page/admin/course/Index";
 import UserPageAdmin from "../page/admin/user/Index";
+import ProfileAdminPage from "../page/admin/profile/Index";
+import EnrollPage from "../page/admin/enroll/Index";
 
 
 // GuestOnlyLayout: chặn người đã đăng nhập vào nhóm route Auth (login/register)
@@ -131,6 +133,15 @@ const routers = [
             {
                 path: "user",
                 element: <UserPageAdmin />
+            },
+            {
+                path: "profile",
+                element: <ProfileAdminPage />
+            }
+            ,
+            {
+                path: "enroll/:courseID",
+                element: <EnrollPage />
             }
         ]
     }

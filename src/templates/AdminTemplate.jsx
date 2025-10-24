@@ -9,6 +9,8 @@ import {
 } from '@ant-design/icons';
 import { Layout, Menu } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
+import { setInfoUser } from '../stores/user';
+import { notyf } from '../ultil/notyf';
 const { Sider } = Layout;
 function getItem(label, key, icon, children) {
   return {
@@ -22,8 +24,6 @@ const items = [
   getItem(<NavLink to="/admin">Thống Kê</NavLink>, '/admin', <PieChartOutlined />),
   getItem(<NavLink to="/admin/course">Quản Lý Khóa Học</NavLink>, '/admin/course', <PieChartOutlined />),
   getItem(<NavLink to="/admin/user">Quản Lý Người Dùng</NavLink>, '/admin/user', <PieChartOutlined />),
-
-
 ];
 const AdminTemplate = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -31,6 +31,12 @@ const AdminTemplate = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { infoUser } = useSelector((state) => state.userSlice);
+  const handleLogout = () => {
+    localStorage.removeItem("INFO_USER");
+    dispatch(setInfoUser(null));
+    notyf.success("Đăng xuất thành công");
+    navigate("/login");
+  };
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider collapsible collapsed={collapsed} onCollapse={value => setCollapsed(value)}>
@@ -64,9 +70,9 @@ const AdminTemplate = () => {
                 <hr />
                 <a href="#" onClick={(e) => {
                   e.preventDefault();
-                  navigate("/profile");
+                  navigate("/admin/profile");
                 }} className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Sửa hồ sơ</a>
-                <a href="#" className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Đăng xuất</a>
+                <button onClick={handleLogout} className="block px-4 py-2 text-gray-700 hover:bg-gray-100">Đăng xuất</button>
               </div>
             </div>
           </div>

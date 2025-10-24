@@ -75,11 +75,19 @@ export const userService = {
     getListMaLoaiNguoiDung: () => {
         return axiosCustom.get('/QuanLyNguoiDung/LayDanhSachLoaiNguoiDung');
     },
-        updateUser: (data) => {
+    updateUser: (data) => {
         return axiosCustom.put(`/QuanLyNguoiDung/CapNhatThongTinNguoiDung`, data);
     },
     deleteUser: (userID) => {
         return axiosCustom.delete(`/QuanLyNguoiDung/XoaNguoiDung?TaiKhoan=${userID}`);
-    }
+    },
+    searchUser: (keyword) => {
+        return axiosCustom.get(`/QuanLyNguoiDung/TimKiemNguoiDung`, {
+            params: {
+                tuKhoa: keyword,
+                MaNhom: "GP01",  // Giá trị mặc định
+            },
+        });
+    },
 
 };
