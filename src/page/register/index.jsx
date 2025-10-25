@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser, clearRegisterSuccess } from "../../stores/user";
+import { registerUser, clearRegisterSuccess, clearError } from "../../stores/user";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -18,6 +18,30 @@ const RegisterPage = () => {
     maNhom: "GP01",
     email: ""
   });
+
+  const [showError, setShowError] = useState(false);
+
+  // Clear error khi component unmount
+  useEffect(() => {
+    return () => {
+      if (error) {
+        dispatch(clearError());
+      }
+    };
+  }, [error, dispatch]);
+
+  // Hiển thị lỗi khi có error từ API
+  useEffect(() => {
+    if (error) {
+      setShowError(true);
+      // Tự động ẩn lỗi sau 5 giây
+      const timer = setTimeout(() => {
+        setShowError(false);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
 
   // Xử lý chuyển hướng sau khi đăng ký thành công
   useEffect(() => {
@@ -47,6 +71,12 @@ const RegisterPage = () => {
         ...prev,
         [name]: ""
       }));
+    }
+    
+    // Xóa lỗi từ API khi người dùng bắt đầu nhập
+    if (error) {
+      dispatch(clearError());
+      setShowError(false);
     }
   };
 
@@ -119,6 +149,16 @@ const RegisterPage = () => {
       email: ""
     });
     setFormErrors({});
+    if (error) {
+      dispatch(clearError());
+      setShowError(false);
+    }
+  };
+
+  // Xử lý đóng thông báo lỗi
+  const handleCloseError = () => {
+    setShowError(false);
+    dispatch(clearError());
   };
 
   return (
@@ -127,12 +167,84 @@ const RegisterPage = () => {
       <div className="absolute -top-20 -left-20 w-72 h-72 rounded-full bg-indigo-400/30 blur-3xl" />
       <div className="absolute -bottom-20 -right-20 w-72 h-72 rounded-full bg-purple-400/30 blur-3xl" />
 
-      {/* Form card */}
-      <div className="w-full max-w-md bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl p-8 relative z-10">
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">Đăng ký tài khoản</h2>
-          <p className="text-gray-600 mt-2">Tạo tài khoản để bắt đầu sử dụng dịch vụ</p>
+      {/* Toast Error Notification */}
+      {error && showError && (
+        <div className="fixed top-4 right-4 z-50 animate-fade-in">
+          <div className="bg-red-500 text-white px-6 py-4 rounded-lg shadow-lg max-w-md">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <p className="font-bold">Lỗi đăng ký</p>
+                  <p className="text-sm opacity-90">{error}</p>
+                </div>
+              </div>
+              <button 
+                onClick={handleCloseError}
+                className="text-white hover:text-gray-200 ml-4"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
+      )}
+
+      {/* Form card */}
+      <div className={`w-full max-w-md bg-white/80 backdrop-blur-xl rounded-2xl shadow-xl p-8 relative z-10 transition-all duration-300 ${
+        error && showError ? 'border-2 border-red-400 shadow-2xl shadow-red-200' : ''
+      }`}>
+        <div className="text-center mb-6">
+          <h2 className={`text-2xl font-bold transition-colors ${
+            error && showError ? 'text-red-600' : 'text-gray-800'
+          }`}>
+            Đăng ký tài khoản
+          </h2>
+          <p className="text-gray-600 mt-2">Tạo tài khoản để bắt đầu sử dụng dịch vụ</p>
+          
+          {/* Error badge trên tiêu đề */}
+          {error && showError && (
+            <div className="mt-2 inline-flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">
+              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              Có lỗi xảy ra
+            </div>
+          )}
+        </div>
+
+        {/* Main Error Alert */}
+        {error && showError && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4 animate-pulse">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3 flex-1">
+                <h3 className="text-sm font-medium text-red-800">
+                  Không thể đăng ký
+                </h3>
+                <div className="mt-1 text-sm text-red-700">
+                  <p>{error}</p>
+                </div>
+              </div>
+              <button 
+                onClick={handleCloseError}
+                className="ml-auto pl-3"
+              >
+                <svg className="w-4 h-4 text-red-400 hover:text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           {/* Tài khoản */}
@@ -145,15 +257,22 @@ const RegisterPage = () => {
               name="taiKhoan"
               value={formData.taiKhoan}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition ${
+              className={`w-full px-3 py-3 border-2 rounded-lg focus:outline-none transition-all ${
                 formErrors.taiKhoan 
-                  ? "border-red-500 focus:ring-red-400" 
-                  : "border-gray-300 focus:ring-indigo-400"
+                  ? "border-red-500 focus:ring-2 focus:ring-red-400 bg-red-50" 
+                  : error && showError 
+                  ? "border-orange-300 focus:ring-2 focus:ring-orange-400 bg-orange-50"
+                  : "border-gray-300 focus:ring-2 focus:ring-indigo-400"
               }`}
               placeholder="Nhập tài khoản (4-20 ký tự)"
             />
             {formErrors.taiKhoan && (
-              <p className="text-red-500 text-xs mt-1">{formErrors.taiKhoan}</p>
+              <p className="text-red-500 text-xs mt-2 flex items-center">
+                <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {formErrors.taiKhoan}
+              </p>
             )}
           </div>
 
@@ -167,15 +286,22 @@ const RegisterPage = () => {
               name="matKhau"
               value={formData.matKhau}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition ${
+              className={`w-full px-3 py-3 border-2 rounded-lg focus:outline-none transition-all ${
                 formErrors.matKhau 
-                  ? "border-red-500 focus:ring-red-400" 
-                  : "border-gray-300 focus:ring-indigo-400"
+                  ? "border-red-500 focus:ring-2 focus:ring-red-400 bg-red-50" 
+                  : error && showError 
+                  ? "border-orange-300 focus:ring-2 focus:ring-orange-400 bg-orange-50"
+                  : "border-gray-300 focus:ring-2 focus:ring-indigo-400"
               }`}
               placeholder="Nhập mật khẩu (ít nhất 6 ký tự)"
             />
             {formErrors.matKhau && (
-              <p className="text-red-500 text-xs mt-1">{formErrors.matKhau}</p>
+              <p className="text-red-500 text-xs mt-2 flex items-center">
+                <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {formErrors.matKhau}
+              </p>
             )}
           </div>
 
@@ -189,15 +315,22 @@ const RegisterPage = () => {
               name="hoTen"
               value={formData.hoTen}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition ${
+              className={`w-full px-3 py-3 border-2 rounded-lg focus:outline-none transition-all ${
                 formErrors.hoTen 
-                  ? "border-red-500 focus:ring-red-400" 
-                  : "border-gray-300 focus:ring-indigo-400"
+                  ? "border-red-500 focus:ring-2 focus:ring-red-400 bg-red-50" 
+                  : error && showError 
+                  ? "border-orange-300 focus:ring-2 focus:ring-orange-400 bg-orange-50"
+                  : "border-gray-300 focus:ring-2 focus:ring-indigo-400"
               }`}
               placeholder="Nhập họ tên đầy đủ"
             />
             {formErrors.hoTen && (
-              <p className="text-red-500 text-xs mt-1">{formErrors.hoTen}</p>
+              <p className="text-red-500 text-xs mt-2 flex items-center">
+                <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {formErrors.hoTen}
+              </p>
             )}
           </div>
 
@@ -211,15 +344,22 @@ const RegisterPage = () => {
               name="soDT"
               value={formData.soDT}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition ${
+              className={`w-full px-3 py-3 border-2 rounded-lg focus:outline-none transition-all ${
                 formErrors.soDT 
-                  ? "border-red-500 focus:ring-red-400" 
-                  : "border-gray-300 focus:ring-indigo-400"
+                  ? "border-red-500 focus:ring-2 focus:ring-red-400 bg-red-50" 
+                  : error && showError 
+                  ? "border-orange-300 focus:ring-2 focus:ring-orange-400 bg-orange-50"
+                  : "border-gray-300 focus:ring-2 focus:ring-indigo-400"
               }`}
               placeholder="Nhập số điện thoại"
             />
             {formErrors.soDT && (
-              <p className="text-red-500 text-xs mt-1">{formErrors.soDT}</p>
+              <p className="text-red-500 text-xs mt-2 flex items-center">
+                <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {formErrors.soDT}
+              </p>
             )}
           </div>
 
@@ -233,15 +373,22 @@ const RegisterPage = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 transition ${
+              className={`w-full px-3 py-3 border-2 rounded-lg focus:outline-none transition-all ${
                 formErrors.email 
-                  ? "border-red-500 focus:ring-red-400" 
-                  : "border-gray-300 focus:ring-indigo-400"
+                  ? "border-red-500 focus:ring-2 focus:ring-red-400 bg-red-50" 
+                  : error && showError 
+                  ? "border-orange-300 focus:ring-2 focus:ring-orange-400 bg-orange-50"
+                  : "border-gray-300 focus:ring-2 focus:ring-indigo-400"
               }`}
               placeholder="Nhập địa chỉ email"
             />
             {formErrors.email && (
-              <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+              <p className="text-red-500 text-xs mt-2 flex items-center">
+                <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {formErrors.email}
+              </p>
             )}
           </div>
 
@@ -254,7 +401,11 @@ const RegisterPage = () => {
               name="maNhom"
               value={formData.maNhom}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className={`w-full px-3 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
+                error && showError 
+                  ? "border-orange-300 focus:ring-orange-400 bg-orange-50" 
+                  : "border-gray-300 focus:ring-indigo-400"
+              }`}
             >
               <option value="GP01">GP01</option>
               <option value="GP02">GP02</option>
@@ -269,27 +420,24 @@ const RegisterPage = () => {
             </select>
           </div>
 
-          {/* Hiển thị lỗi từ API */}
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
-              <span className="text-sm">{error}</span>
-            </div>
-          )}
-
           {/* Nút hành động */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={handleReset}
-              className="flex-1 py-2 px-4 bg-gray-300 text-gray-700 font-semibold rounded-lg shadow-md hover:bg-gray-400 transition"
+              className="flex-1 py-3 px-4 bg-gray-300 text-gray-700 font-semibold rounded-lg shadow-md hover:bg-gray-400 transition-all duration-200"
             >
               Làm mới
             </button>
             <button
               type="submit"
               disabled={loading}
-              className={`flex-1 py-2 px-4 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition ${
-                loading ? "opacity-70 cursor-not-allowed" : ""
+              className={`flex-1 py-3 px-4 font-semibold rounded-lg shadow-md transition-all duration-200 ${
+                loading 
+                  ? "bg-gray-400 text-white cursor-not-allowed" 
+                  : error && showError
+                  ? "bg-red-600 text-white hover:bg-red-700"
+                  : "bg-indigo-600 text-white hover:bg-indigo-700"
               }`}
             >
               {loading ? (
@@ -301,7 +449,18 @@ const RegisterPage = () => {
                   Đang xử lý...
                 </span>
               ) : (
-                "Đăng ký"
+                <span className="flex items-center justify-center">
+                  {error && showError ? (
+                    <>
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Thử lại
+                    </>
+                  ) : (
+                    "Đăng ký"
+                  )}
+                </span>
               )}
             </button>
           </div>
@@ -311,12 +470,25 @@ const RegisterPage = () => {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Đã có tài khoản?{" "}
-            <Link to="/login" className="text-indigo-600 hover:underline font-medium">
+            <Link to="/login" className={`hover:underline font-medium ${
+              error && showError ? 'text-red-600' : 'text-indigo-600'
+            }`}>
               Đăng nhập ngay
             </Link>
           </p>
         </div>
       </div>
+
+      {/* Thêm CSS animations */}
+      <style jsx>{`
+        @keyframes fade-in {
+          from { opacity: 0; transform: translateY(-10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+          animation: fade-in 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 };
