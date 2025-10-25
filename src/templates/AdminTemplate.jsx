@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import {
-  AreaChartOutlined,
-  BookOutlined,
+  DesktopOutlined,
+  FileOutlined,
+  PieChartOutlined,
+  TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import { Layout, Menu } from 'antd';
@@ -19,9 +21,9 @@ function getItem(label, key, icon, children) {
   };
 }
 const items = [
-  getItem(<NavLink to="/admin">Thống Kê</NavLink>, '/admin', <AreaChartOutlined />),
-  getItem(<NavLink to="/admin/course">Quản Lý Khóa Học</NavLink>, '/admin/course', <BookOutlined />),
-  getItem(<NavLink to="/admin/user">Quản Lý Người Dùng</NavLink>, '/admin/user', <UserOutlined />),
+  getItem(<NavLink to="/admin">Thống Kê</NavLink>, '/admin', <PieChartOutlined />),
+  getItem(<NavLink to="/admin/course">Quản Lý Khóa Học</NavLink>, '/admin/course', <PieChartOutlined />),
+  getItem(<NavLink to="/admin/user">Quản Lý Người Dùng</NavLink>, '/admin/user', <PieChartOutlined />),
 ];
 const AdminTemplate = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -38,7 +40,7 @@ const AdminTemplate = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider collapsible collapsed={collapsed} onCollapse={value => setCollapsed(value)}>
-        <div className="demo-logo-vertical text-white text-2xl px-3 text-center mb-10 mt-5" >ADMIN PAGES</div>
+        <div className="demo-logo-vertical" >logo</div>
         <Menu theme="dark" selectedKeys={[location.pathname]} mode="inline" items={items} />
       </Sider>
       <Layout>
