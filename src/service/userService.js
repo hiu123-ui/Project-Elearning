@@ -1,21 +1,47 @@
 import { axiosCustom } from "./config";
 
 export const userService = {
-    login: (infoUser) => {
-        return axiosCustom.post('/QuanLyNguoiDung/DangNhap', infoUser);
+    login: async (infoUser) => {
+        try {
+            const response = await axiosCustom.post('/QuanLyNguoiDung/DangNhap', infoUser);
+            return response;
+        } catch (error) {
+            // Xử lý lỗi chi tiết hơn
+            if (error.response) {
+                const serverError = error.response.data;
+                throw new Error(serverError.content || serverError.message || 'Đăng nhập thất bại');
+            } else if (error.request) {
+                throw new Error('Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.');
+            } else {
+                throw new Error('Đã xảy ra lỗi không xác định.');
+            }
+        }
     },
 
-    register: (registerData) => {
-        const formattedData = {
-            taiKhoan: registerData.taiKhoan,
-            matKhau: registerData.matKhau,
-            hoTen: registerData.hoTen,
-            soDT: registerData.soDT,
-            maNhom: registerData.maNhom || "GP01",
-            email: registerData.email
-        };
+    register: async (registerData) => {
+        try {
+            const formattedData = {
+                taiKhoan: registerData.taiKhoan,
+                matKhau: registerData.matKhau,
+                hoTen: registerData.hoTen,
+                soDT: registerData.soDT,
+                maNhom: registerData.maNhom || "GP01",
+                email: registerData.email
+            };
 
-        return axiosCustom.post('/QuanLyNguoiDung/DangKy', formattedData);
+            const response = await axiosCustom.post('/QuanLyNguoiDung/DangKy', formattedData);
+            return response;
+        } catch (error) {
+            // Xử lý lỗi chi tiết hơn
+            if (error.response) {
+                const serverError = error.response.data;
+                throw new Error(serverError.content || serverError.message || 'Đăng ký thất bại');
+            } else if (error.request) {
+                throw new Error('Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.');
+            } else {
+                throw new Error('Đã xảy ra lỗi không xác định.');
+            }
+        }
     },
 
     getUserInfo: () => {
